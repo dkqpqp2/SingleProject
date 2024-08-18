@@ -17,3 +17,5 @@ exe
 # Builds
 Build/*
 Windows/*
+
+.uasset
