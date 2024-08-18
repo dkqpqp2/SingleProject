@@ -70,10 +70,9 @@ void US_EquipmentPanel::RefreshEquipmentSlot()
 {
     if (EquipmentReference && EquipmentSlotClass)
     {
-        for (auto& Slot : EquipmentReference->GetEquippedItems())
-        {
-            US_EquipmentSlot* EquipSlot = CreateWidget<US_EquipmentSlot>(this, EquipmentSlotClass);
-            EquipSlot->SetItemReference(Slot.Value);
-        }
+   
+        US_EquipmentSlot* EquipSlot = CreateWidget<US_EquipmentSlot>(this, EquipmentSlotClass);
+        //EquipSlot->SetItemReference();
+
     }
 }
