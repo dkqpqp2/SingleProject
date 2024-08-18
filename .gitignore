@@ -18,4 +18,4 @@ exe
 Build/*
 Windows/*
 
-.uasset
+*.uasset
