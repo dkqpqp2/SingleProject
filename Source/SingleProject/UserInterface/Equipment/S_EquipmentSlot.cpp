@@ -2,6 +2,7 @@
 
 
 #include "S_EquipmentSlot.h"
+#include "GameFramework/Character.h"
 #include "Items/S_ItemBase.h"
 #include "UserInterface/Inventory/S_ItemDragDropOperation.h"
 #include "UserInterface/Inventory/S_InventoryItemSlot.h"
@@ -9,6 +10,8 @@
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/S_EquipmentComponent.h"
+#include "Components/S_InventoryComponent.h"
 
 void US_EquipmentSlot::NativeOnInitialized()
 {
@@ -46,10 +49,37 @@ void US_EquipmentSlot::NativeConstruct()
 
 FReply US_EquipmentSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+	}
+	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		OnItemClicked();
+		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::RightMouseButton);
+	}
+
+	return Reply.Unhandled();
 }
 
+void US_EquipmentSlot::OnItemClicked()
+{
+	ACharacter* OwningPlayerCharacter = Cast<ACharacter>(GetOwningPlayerPawn());
+	//OwningPlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningLocalPlayer());
+	if (OwningPlayerCharacter && EquippedItem)
+	{
+		US_InventoryComponent* InventoryComponent = OwningPlayerCharacter->FindComponentByClass<US_InventoryComponent>();
+		if (InventoryComponent)
+		{
+			InventoryComponent->HandleAddItem(EquippedItem);
+		}
+
+		US_EquipmentComponent* EquipmentComponent = OwningPlayerCharacter->FindComponentByClass<US_EquipmentComponent>();
+		EquipmentComponent->UnequipItem(TEXT("Weapon"), TEXT("WeaponSocket"));
+	}
+}
 void US_EquipmentSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);

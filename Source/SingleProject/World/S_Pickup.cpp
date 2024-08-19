@@ -110,7 +110,9 @@ void AS_Pickup::TakePickup(const AS_CharacterPlayer* Taker)
 		{
 			if (US_InventoryComponent* PlayerInventory = Taker->GetInventory())
 			{
-				const FItemAddResult AddResult = PlayerInventory->HandleAddItem(ItemReference);
+				//1. 아이템을 우선 Copy로 생성한다
+				US_ItemBase* NewItem = ItemReference->CreateItem(Taker);
+				const FItemAddResult AddResult = PlayerInventory->HandleAddItem(NewItem);
 
 				switch (AddResult.OperationResult)
 				{

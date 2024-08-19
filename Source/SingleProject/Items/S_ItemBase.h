@@ -9,6 +9,14 @@
 class AS_CharacterPlayer;
 class US_InventoryComponent;
 class US_EquipmentSlot;
+
+UENUM()
+enum class ESlotName : uint8
+{
+	
+
+};
+
 /**
  * 
  */
@@ -59,6 +67,9 @@ public:
 	void ResetItemFlags();
 
 	TObjectPtr<US_ItemBase> CreateItemCopy() const;
+	TObjectPtr<US_ItemBase> CreateItem(const AS_CharacterPlayer* Player);
+
+	void SetOwner(AS_CharacterPlayer* Character);
 
 	UFUNCTION(Category = "Item")
 	float GetItemStackWeight() const { return Quantity * ItemNumericData.Weight; };
@@ -80,8 +91,9 @@ public:
 protected:
 	bool operator==(const FName& OtherID) const
 	{
-		return this->ID == OtherID;
+		return ID == OtherID;
 	}
 
-
+	UPROPERTY()
+	TObjectPtr<AS_CharacterPlayer> OwnerCharacter;
 };

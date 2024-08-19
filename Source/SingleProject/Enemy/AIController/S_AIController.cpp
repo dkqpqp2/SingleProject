@@ -12,7 +12,7 @@ const FName AS_AIController::TargetKey(TEXT("Target"));
 
 AS_AIController::AS_AIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Script/AIModule.BlackboardData'/Game/Character/Blueprints/Enemy/BB_Enemey.BB_Enemey'"));
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(TEXT("/Script/AIModule.BlackboardData'/Game/Character/Blueprints/Enemy/BB_Enemy.BB_Enemy'"));
 	if (BBAssetRef.Object)
 	{
 		BBAsset = BBAssetRef.Object;

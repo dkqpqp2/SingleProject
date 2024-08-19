@@ -261,21 +261,8 @@ FItemAddResult US_InventoryComponent::HandleAddItem(US_ItemBase* InputItem)
 
 void US_InventoryComponent::AddNewItem(US_ItemBase* Item, const int32 AmountToAdd)
 {
-	US_ItemBase* NewItem;
+	US_ItemBase* NewItem = Item;
 
-	if (Item->bIsCopy || Item->bIsPickup)
-	{
-		// if the item is already a copy, or is a world pickup.
-		NewItem = Item;
-		NewItem->ResetItemFlags();
-	}
-	else
-	{
-		// used when splitting or dragging to/from another inventory.
-		NewItem = Item->CreateItemCopy();
-	}
-
-	NewItem->OwningInventory = this;
 	NewItem->SetQuantity(AmountToAdd);
 
 	InventoryContents.Add(NewItem);

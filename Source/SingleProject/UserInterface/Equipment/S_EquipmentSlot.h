@@ -20,6 +20,7 @@ public:
 
 	void UpdateSlot();
 
+	void OnItemClicked();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
 	TObjectPtr<class US_ItemBase> EquippedItem;

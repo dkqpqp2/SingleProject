@@ -25,17 +25,54 @@ TObjectPtr<US_ItemBase> US_ItemBase::CreateItemCopy() const
 {
 	US_ItemBase* ItemCopy = NewObject<US_ItemBase>(StaticClass());
 
-	ItemCopy->ID = this->ID;
-	ItemCopy->Quantity = this->Quantity;
-	ItemCopy->ItemQuality = this->ItemQuality;
-	ItemCopy->ItemType = this->ItemType;
-	ItemCopy->ItemNumericData = this->ItemNumericData;
-	ItemCopy->ItemStatistics = this->ItemStatistics;
-	ItemCopy->ItemAssetData = this->ItemAssetData;
+	ItemCopy->ID = ID;
+	ItemCopy->Quantity = Quantity;
+	ItemCopy->ItemQuality = ItemQuality;
+	ItemCopy->ItemType = ItemType;
+	ItemCopy->ItemNumericData = ItemNumericData;
+	ItemCopy->ItemStatistics = ItemStatistics;
+	ItemCopy->ItemAssetData = ItemAssetData;
+
+	ItemCopy->OwningInventory = OwningInventory;
+	ItemCopy->OwningEquipment = OwningEquipment;
 
 	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;
+}
+
+TObjectPtr<US_ItemBase> US_ItemBase::CreateItem(const AS_CharacterPlayer* Player)
+{
+	US_ItemBase* ItemCopy = NewObject<US_ItemBase>(StaticClass());
+
+	ItemCopy->ID = ID;
+	ItemCopy->Quantity = Quantity;
+	ItemCopy->ItemQuality = ItemQuality;
+	ItemCopy->ItemType = ItemType;
+	ItemCopy->ItemNumericData = ItemNumericData;
+	ItemCopy->ItemStatistics = ItemStatistics;
+	ItemCopy->ItemAssetData = ItemAssetData;
+
+	//플레이어가 가지는 인벤토리 및 장비 컴포넌트 세팅
+	//ItemCopy->OwningPlayer = Player; 이거로 하면 나중에 다른 컴포넌트 찾아서 사용도 가능
+	ItemCopy->OwningInventory = Player->FindComponentByClass<US_InventoryComponent>();
+	ItemCopy->OwningEquipment = Player->FindComponentByClass<US_EquipmentComponent>();
+
+	ItemCopy->bIsCopy = true;
+
+	return ItemCopy;
+}
+
+void US_ItemBase::SetOwner(AS_CharacterPlayer* Character)
+{
+	if (!Character)
+	{
+		return;
+	}
+
+	OwnerCharacter = Character;
+	OwningInventory = OwnerCharacter->FindComponentByClass<US_InventoryComponent>();
+	OwningEquipment = OwnerCharacter->FindComponentByClass<US_EquipmentComponent>();
 }
 
 void US_ItemBase::SetQuantity(const int32 NewQuantity)
@@ -43,11 +80,11 @@ void US_ItemBase::SetQuantity(const int32 NewQuantity)
 	if (NewQuantity != Quantity)
 	{
 		Quantity = FMath::Clamp(NewQuantity, 0, ItemNumericData.bIsStackable ? ItemNumericData.MaxStackSize : 1);
-		if (this->OwningInventory)
+		if (OwningInventory)
 		{
-			if (this->Quantity <= 0)
+			if (Quantity <= 0)
 			{
-				this->OwningInventory->RemoveSingleInstanceOfItem(this);
+				OwningInventory->RemoveSingleInstanceOfItem(this);
 			}
 		}
 		else
@@ -67,31 +104,30 @@ void US_ItemBase::Use(AS_CharacterPlayer* Character, US_ItemBase* UseItem)
 	switch (ItemType)
 	{
 	case EItemType::Weapon:
-		EquipToSocket(Character, TEXT("WeaponSocket")); // 무기 소켓에 장착
-		OwningInventory->RemoveSingleInstanceOfItem(UseItem);
-		Character->EquipmentPanel->RefreshEquipmentSlot();
+		OwningEquipment->EquipItem(TEXT("Weapon"), TEXT("WeaponSocket"), this);
+		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 
 		break;
 	case EItemType::Armor:
 		EquipToSocket(Character, TEXT("ArmorSocket")); // 방어구 소켓에 장착
-		OwningInventory->RemoveAmountOfItem(UseItem, this->Quantity);
+		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 
 		break;
 	case EItemType::Helmet:
 		EquipToSocket(Character, TEXT("HelmetSocket")); // 투구 소켓에 장착
-		OwningInventory->RemoveAmountOfItem(UseItem, this->Quantity);
+		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 
 		break;
 	case EItemType::Shield:
 		EquipToSocket(Character, TEXT("ShieldSocket")); // 방패 소켓에 장착
-		OwningInventory->RemoveAmountOfItem(UseItem, this->Quantity);
+		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 
 		break;
 	case EItemType::Spell:
 		break;
 	case EItemType::Boots:
 		EquipToSocket(Character, TEXT("BootsSocket")); // 신발 소켓에 장착
-		OwningInventory->RemoveAmountOfItem(this, this->Quantity);
+		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 		EquipmentSlot->SetItemReference(UseItem);
 		
 		break;

@@ -40,7 +40,7 @@ public:
 	TObjectPtr<class AS_CharacterPlayer> PlayerCharacter;
 
 	UPROPERTY()
-	TObjectPtr<class US_EquipmentComponent> EquipmentReference;
+	TObjectPtr<class US_EquipmentComponent> OwningEquipment;
 
 	UPROPERTY()
 	TSubclassOf<class US_EquipmentSlot> EquipmentSlotClass;

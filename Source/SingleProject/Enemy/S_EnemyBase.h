@@ -26,12 +26,11 @@ public:
 	// Sets default values for this character's properties
 	AS_EnemyBase();
 
+	UPROPERTY(VisibleAnywhere)
+	EEnemyType CurrentEnemyType;
 
 protected:
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(VisibleAnywhere)
-	EEnemyType CurrentEnemyType;
 
 	float MaxHp;
 

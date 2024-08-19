@@ -22,10 +22,10 @@ void US_EquipmentPanel::NativeOnInitialized()
     PlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningPlayerPawn());
     if (PlayerCharacter)
     {
-        EquipmentReference = PlayerCharacter->GetEquipment();
-        if (EquipmentReference)
+        OwningEquipment = PlayerCharacter->GetEquipment();
+        if (OwningEquipment)
         {
-            EquipmentReference->OnEquipmentUpdated.AddUObject(this, &US_EquipmentPanel::RefreshEquipmentSlot);
+            OwningEquipment->OnEquipmentUpdated.AddUObject(this, &US_EquipmentPanel::RefreshEquipmentSlot);
             SetInfoText();
         }
     }
@@ -57,9 +57,9 @@ void US_EquipmentPanel::InitializeSlots()
 
 void US_EquipmentPanel::SetInfoText() const
 {
-    const FString DamageTotalText{ FString::SanitizeFloat(EquipmentReference->GetEquipmentTotalDamage()) };
+    const FString DamageTotalText{ FString::SanitizeFloat(OwningEquipment->GetEquipmentTotalDamage()) };
 
-    const FString ArmorTotalText{ FString::SanitizeFloat(EquipmentReference->GetEquipmentTotalArmor()) };
+    const FString ArmorTotalText{ FString::SanitizeFloat(OwningEquipment->GetEquipmentTotalArmor()) };
 
     DamageInfo->SetText(FText::FromString(DamageTotalText));
     ArmorInfo->SetText(FText::FromString(ArmorTotalText));
@@ -68,11 +68,18 @@ void US_EquipmentPanel::SetInfoText() const
 
 void US_EquipmentPanel::RefreshEquipmentSlot()
 {
-    if (EquipmentReference && EquipmentSlotClass)
+    if (OwningEquipment)
     {
-   
-        US_EquipmentSlot* EquipSlot = CreateWidget<US_EquipmentSlot>(this, EquipmentSlotClass);
-        //EquipSlot->SetItemReference();
-
+        US_ItemBase* Weapon = OwningEquipment->GetEquippedItem(TEXT("Weapon"));
+        if (Weapon)
+        {
+            WeaponSlot->SetItemReference(Weapon);
+            WeaponSlot->UpdateSlot();
+        }
+        else
+        {
+            WeaponSlot->SetItemReference(nullptr);
+            WeaponSlot->UpdateSlot();
+        }
     }
 }

@@ -8,6 +8,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnEquipmentUpdated);
 class US_ItemBase;
+class UStaticMeshComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SINGLEPROJECT_API US_EquipmentComponent : public UActorComponent
@@ -19,8 +20,8 @@ public:
 
 	US_EquipmentComponent();
 
-	void EquipItem(const FString& SlotName, US_ItemBase* Item) ;
-	void UnequipItem(const FString& SlotName);
+	void EquipItem(const FString& SlotName, const FName& SocketName, US_ItemBase* Item) ;
+	void UnequipItem(const FString& SlotName, const FName& SocketName);
 	US_ItemBase* GetEquippedItem(const FString& SlotName) const;
 	bool IsSlotOccupied(const FString& SlotName) const;
 
@@ -43,5 +44,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
 	TMap<FString, TObjectPtr<US_ItemBase>> EquippedItems; // 예: "Weapon", "Helmet", "Armor" 같은 키를 사용
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
+	TMap<FName, TObjectPtr<UStaticMeshComponent>> SocketEquippedItems; // 예: "Weapon", "Helmet", "Armor" 같은 키를 사용
 
 };
