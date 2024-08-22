@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Items/S_ItemBase.h"
+#include "Components/S_EquipmentComponent.h"
 #include "S_EquipmentSlot.generated.h"
 
 class US_ItemBase;
@@ -37,7 +39,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", meta = (ExposeOnSpawn = "true"))
 	TObjectPtr<class UTexture2D> EmptyTexture;
 
+	TMap<ESlotName, FName> SlotToSocketMap;
+
 	bool bIsEmpty;
+
+	ESlotName SlotWidgetName;
 
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;

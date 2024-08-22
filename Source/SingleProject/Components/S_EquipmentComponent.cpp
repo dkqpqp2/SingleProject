@@ -23,8 +23,9 @@ void US_EquipmentComponent::BeginPlay()
 	
 }
 
-void US_EquipmentComponent::EquipItem(const FString& SlotName, const FName& SocketName, US_ItemBase* Item)
+void US_EquipmentComponent::EquipItem(const ESlotName SlotName, const FName& SocketName, US_ItemBase* Item)
 {
+	const FString SlotNameString = StaticEnum<ESlotName>()->GetValueAsString(SlotName);
 	if (Item == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EquipItem: Item is null."));
@@ -34,14 +35,14 @@ void US_EquipmentComponent::EquipItem(const FString& SlotName, const FName& Sock
 
 	if (IsSlotOccupied(SlotName))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EquipItem: Slot %s is already occupied."), *SlotName);
+		UE_LOG(LogTemp, Warning, TEXT("EquipItem: Slot %s is already occupied."), *SlotNameString);
 		return;
 	}
 
 	EquippedItems.Add(SlotName, Item);
 	
 	// 슬롯에 아이템이 장착되었다는 것을 UI나 다른 시스템에 알리기 위한 로직 추가 가능
-	UE_LOG(LogTemp, Warning, TEXT("Item %s equipped to slot %s."), *Item->GetName(), *SlotName);
+	UE_LOG(LogTemp, Warning, TEXT("Item %s equipped to slot %s."), *Item->GetName(), *SlotNameString);
 
 	//2. 기존의 ItemBase의 EquipToSocket 함수를 옮겨옴
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
@@ -65,11 +66,12 @@ void US_EquipmentComponent::EquipItem(const FString& SlotName, const FName& Sock
 	OnEquipmentUpdated.Broadcast();
 }
 
-void US_EquipmentComponent::UnequipItem(const FString& SlotName, const FName& SocketName)
+void US_EquipmentComponent::UnequipItem(const ESlotName SlotName , const FName& SocketName)
 {
+	const FString SlotNameString = StaticEnum<ESlotName>()->GetValueAsString(SlotName);
 	if (!IsSlotOccupied(SlotName))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnequipItem: Slot %s is not occupied."), *SlotName);
+		UE_LOG(LogTemp, Warning, TEXT("UnequipItem: Slot %s is not occupied."), *SlotNameString);
 		return;
 	}
 
@@ -77,7 +79,7 @@ void US_EquipmentComponent::UnequipItem(const FString& SlotName, const FName& So
 	EquippedItems.Remove(SlotName);
 
 	// 슬롯에서 아이템이 해제되었다는 것을 UI나 다른 시스템에 알리기 위한 로직 추가 가능
-	UE_LOG(LogTemp, Warning, TEXT("Item %s unequipped from slot %s."), *RemovedItem->GetName(), *SlotName);
+	UE_LOG(LogTemp, Warning, TEXT("Item %s unequipped from slot %s."), *RemovedItem->GetName(), *SlotNameString);
 
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
 	if (!Character)
@@ -98,7 +100,7 @@ void US_EquipmentComponent::UnequipItem(const FString& SlotName, const FName& So
 	OnEquipmentUpdated.Broadcast();
 }
 
-US_ItemBase* US_EquipmentComponent::GetEquippedItem(const FString& SlotName) const
+US_ItemBase* US_EquipmentComponent::GetEquippedItem(const ESlotName  SlotName) const
 {
 	if (IsSlotOccupied(SlotName))
 	{
@@ -107,7 +109,7 @@ US_ItemBase* US_EquipmentComponent::GetEquippedItem(const FString& SlotName) con
 	return nullptr;
 }
 
-bool US_EquipmentComponent::IsSlotOccupied(const FString& SlotName) const
+bool US_EquipmentComponent::IsSlotOccupied(const ESlotName  SlotName) const
 {
 	return EquippedItems.Contains(SlotName);
 }

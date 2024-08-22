@@ -100,36 +100,31 @@ void US_ItemBase::Use(AS_CharacterPlayer* Character, US_ItemBase* UseItem)
 	{
 		return;
 	}
-	US_ItemBase* EquipItem = this;
+
 	switch (ItemType)
 	{
 	case EItemType::Weapon:
-		OwningEquipment->EquipItem(TEXT("Weapon"), TEXT("WeaponSocket"), this);
+		OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
-
 		break;
 	case EItemType::Armor:
-		EquipToSocket(Character, TEXT("ArmorSocket")); // 방어구 소켓에 장착
+		OwningEquipment->EquipItem(ESlotName::Armor, TEXT("ArmorSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
-
 		break;
 	case EItemType::Helmet:
-		EquipToSocket(Character, TEXT("HelmetSocket")); // 투구 소켓에 장착
+		OwningEquipment->EquipItem(ESlotName::Helmet, TEXT("HelmetSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
-
 		break;
 	case EItemType::Shield:
-		EquipToSocket(Character, TEXT("ShieldSocket")); // 방패 소켓에 장착
+		OwningEquipment->EquipItem(ESlotName::Shield, TEXT("ShieldSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
-
 		break;
 	case EItemType::Spell:
 		break;
 	case EItemType::Boots:
-		EquipToSocket(Character, TEXT("BootsSocket")); // 신발 소켓에 장착
+		OwningEquipment->EquipItem(ESlotName::Boots, TEXT("BootsSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
 		EquipmentSlot->SetItemReference(UseItem);
-		
 		break;
 	case EItemType::Consumable:
 		OwningInventory->RemoveAmountOfItem(UseItem, 1);

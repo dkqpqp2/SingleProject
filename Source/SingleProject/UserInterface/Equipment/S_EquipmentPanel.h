@@ -48,6 +48,9 @@ public:
 	UFUNCTION()
 	void RefreshEquipmentSlot();
 
+	TMap<ESlotName, TObjectPtr<US_EquipmentSlot>> SlotWidgetMap;
+
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnInitialized() override;

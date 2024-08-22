@@ -6,6 +6,7 @@
 #include "Character/S_CharacterPlayer.h"
 #include "Components/S_EquipmentComponent.h"
 #include "Components/TextBlock.h"
+#include "Items/S_ItemBase.h"
 
 void US_EquipmentPanel::NativeConstruct()
 {
@@ -13,7 +14,14 @@ void US_EquipmentPanel::NativeConstruct()
 
     // 슬롯 초기화
     InitializeSlots();
-   
+
+    SlotWidgetMap = {
+         {ESlotName::Weapon, WeaponSlot},
+         {ESlotName::Helmet, HelmetSlot},
+         {ESlotName::Armor, ArmorSlot},
+         {ESlotName::Shield, ShieldSlot},
+         {ESlotName::Boots, BootsSlot}
+    };
 }
 
 void US_EquipmentPanel::NativeOnInitialized()
@@ -33,7 +41,15 @@ void US_EquipmentPanel::NativeOnInitialized()
 
 void US_EquipmentPanel::InitializeSlots()
 {
-    if (WeaponSlot)
+    for (const auto& SlotWidgetPair : SlotWidgetMap)
+    {
+        TObjectPtr<US_EquipmentSlot> SlotWidget = SlotWidgetPair.Value;
+        if (SlotWidget)
+        {
+            SlotWidget->UpdateSlot();
+        }
+    }
+    /*if (WeaponSlot)
     {
         WeaponSlot->UpdateSlot();
     }
@@ -52,7 +68,7 @@ void US_EquipmentPanel::InitializeSlots()
     if (BootsSlot)
     {
         BootsSlot->UpdateSlot();
-    }
+    }*/
 }
 
 void US_EquipmentPanel::SetInfoText() const
@@ -68,9 +84,31 @@ void US_EquipmentPanel::SetInfoText() const
 
 void US_EquipmentPanel::RefreshEquipmentSlot()
 {
+    
     if (OwningEquipment)
     {
-        US_ItemBase* Weapon = OwningEquipment->GetEquippedItem(TEXT("Weapon"));
+        for (const auto& SlotWidgetPair : SlotWidgetMap)
+        {
+            ESlotName SlotName = SlotWidgetPair.Key;
+            TObjectPtr<US_EquipmentSlot> SlotWidget = SlotWidgetPair.Value;
+
+            if (SlotWidget)
+            {
+                US_ItemBase* EquippedItem = OwningEquipment->GetEquippedItem(SlotName);
+                if (EquippedItem)
+                {
+                    SlotWidget->SetItemReference(EquippedItem);
+                    SlotWidget->UpdateSlot();
+                }
+                else
+                {
+                    SlotWidget->SetItemReference(nullptr);
+                    SlotWidget->UpdateSlot();
+                }
+               
+            }
+        }
+        /*US_ItemBase* Weapon = OwningEquipment->GetEquippedItem(ESlotName::Weapon);
         if (Weapon)
         {
             WeaponSlot->SetItemReference(Weapon);
@@ -80,6 +118,7 @@ void US_EquipmentPanel::RefreshEquipmentSlot()
         {
             WeaponSlot->SetItemReference(nullptr);
             WeaponSlot->UpdateSlot();
-        }
+        }*/
     }
+    SetInfoText();
 }

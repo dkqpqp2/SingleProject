@@ -10,13 +10,16 @@ class AS_CharacterPlayer;
 class US_InventoryComponent;
 class US_EquipmentSlot;
 
+
 UENUM()
 enum class ESlotName : uint8
 {
-	
-
+	Weapon UMETA(DisplayName = "무기"),
+	Helmet UMETA(DisplayName = "투구"),
+	Armor UMETA(DisplayName = "방어구"),
+	Shield UMETA(DisplayName = "방패"),
+	Boots UMETA(DisplayName = "신발")
 };
-
 /**
  * 
  */

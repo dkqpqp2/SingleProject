@@ -45,6 +45,15 @@ void US_EquipmentSlot::NativeConstruct()
 		ItemIcon->SetBrushFromTexture(EquippedItem->ItemAssetData.Icon);
 
 	}
+
+	SlotToSocketMap =
+	{
+		{ESlotName::Weapon, TEXT("WeaponSocket") },
+		{ESlotName::Helmet, TEXT("HelmetSocket") },
+		{ESlotName::Armor, TEXT("ArmorSocket") },
+		{ESlotName::Shield, TEXT("ShieldSocket") },
+		{ESlotName::Boots, TEXT("BootsSocket") },
+	};
 }
 
 FReply US_EquipmentSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -74,10 +83,24 @@ void US_EquipmentSlot::OnItemClicked()
 		if (InventoryComponent)
 		{
 			InventoryComponent->HandleAddItem(EquippedItem);
+
+			EquippedItem = nullptr;
 		}
 
 		US_EquipmentComponent* EquipmentComponent = OwningPlayerCharacter->FindComponentByClass<US_EquipmentComponent>();
-		EquipmentComponent->UnequipItem(TEXT("Weapon"), TEXT("WeaponSocket"));
+		if (EquipmentComponent)
+		{			
+			ESlotName SlotName = EquipmentComponent->GetSlotNames();
+
+			if (SlotToSocketMap.Contains(SlotName))
+			{
+				FName SocketName = SlotToSocketMap[SlotName];
+				EquipmentComponent->UnequipItem(SlotName, SocketName);
+
+				//EquipmentComponent->UnequipItem(ESlotName::Weapon, TEXT("WeaponSocket"));
+			}
+		}
+		
 	}
 }
 void US_EquipmentSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -119,3 +142,4 @@ void US_EquipmentSlot::UpdateSlot()
         }
     }
 }
+
