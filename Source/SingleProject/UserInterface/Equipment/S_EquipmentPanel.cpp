@@ -56,7 +56,6 @@ bool US_EquipmentPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
     if (ItemDragDrop && ItemDragDrop->SourceItem)
     {
         ItemDragDrop->SourceItem->Use(PlayerCharacter, ItemDragDrop->SourceItem);
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("Damege: %s || Armor: %s"), ItemDragDrop->SourceItem->ItemStatistics.DamageValue, ItemDragDrop->SourceItem->ItemStatistics.ArmorRating));
         return true;
     }
     return false;

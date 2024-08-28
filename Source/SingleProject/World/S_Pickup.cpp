@@ -40,6 +40,7 @@ void AS_Pickup::InitializePickup(const TSubclassOf<US_ItemBase> BaseClass, const
 		ItemReference->ItemType = ItemData->ItemType;
 		ItemReference->ItemQuality = ItemData->ItemQuality;
 		ItemReference->ItemNumericData = ItemData->ItemNumericData;
+		ItemReference->ItemStatistics = ItemData->ItemStaistics;
 		ItemReference->ItemTextData = ItemData->ItemTextData;
 		ItemReference->ItemAssetData = ItemData->ItemAssetData;
 

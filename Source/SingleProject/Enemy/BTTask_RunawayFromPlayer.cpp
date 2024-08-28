@@ -10,6 +10,7 @@
 #include "NavigationSystem.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_RunawayFromPlayer::UBTTask_RunawayFromPlayer()
 {
@@ -49,7 +50,6 @@ EBTNodeResult::Type UBTTask_RunawayFromPlayer::ExecuteTask(UBehaviorTreeComponen
 		HandleEnemyType(OwnerComp, Enemy, ControllingPawn, Center, PatrolRadius, ForwardVector);
 		return EBTNodeResult::Succeeded;
 	}
-
 	return EBTNodeResult::Failed;
 }
 
@@ -60,7 +60,7 @@ bool UBTTask_RunawayFromPlayer::DetectAndSetTarget(UBehaviorTreeComponent& Owner
 	{
 		return false;
 	}
-
+	AS_EnemyBase* Enemy = Cast<AS_EnemyBase>(ControllingPawn);
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
 	bool bResult = World->OverlapMultiByChannel(
@@ -97,10 +97,6 @@ bool UBTTask_RunawayFromPlayer::DetectAndSetTarget(UBehaviorTreeComponent& Owner
 		}
 	}
 
-	// 타겟을 찾지 못했을 경우, 블랙보드에서 타겟을 null로 설정
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
-
 	return false;
 }
 
@@ -114,20 +110,17 @@ void UBTTask_RunawayFromPlayer::HandleEnemyType(UBehaviorTreeComponent& OwnerCom
 		if (bTargetDetected)
 		{
 			this->RunAwayFromPlayer(OwnerComp, ControllingPawn, Center);
+			Enemy->GetCharacterMovement()->MaxWalkSpeed = 450.0f;
 		}
 		break;
 	case EEnemyType::Wolf:
 		bTargetDetected = this->DetectAndSetTarget(OwnerComp, ControllingPawn, Center, DetectRadius, false, FVector::ZeroVector);
+		Enemy->GetCharacterMovement()->MaxWalkSpeed = 500.0f;
 		break;
 	default:
 		break;
 	}
 
-	// 타겟이 감지되지 않은 경우 Blackboard의 타겟을 초기화
-	if (!bTargetDetected)
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
-	}
 }
 
 void UBTTask_RunawayFromPlayer::RunAwayFromPlayer(UBehaviorTreeComponent& OwnerComp, APawn* ControllingPawn, FVector Center)
@@ -136,11 +129,12 @@ void UBTTask_RunawayFromPlayer::RunAwayFromPlayer(UBehaviorTreeComponent& OwnerC
 	if (Target)
 	{
 		FVector DirectionAwayFromPlayer = (Center - Target->GetActorLocation()).GetSafeNormal();
-		FVector RunawayLocation = Center + DirectionAwayFromPlayer * 500.0f;  // 500 단위만큼 멀어지는 위치로 설정
+		FVector RunawayLocation = Center + DirectionAwayFromPlayer * 1000.0f;  // 500 단위만큼 멀어지는 위치로 설정
 
 		// 블랙보드에 도망 위치 설정
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AS_AIController::RunawayLocationKey, RunawayLocation);
-
+		// 도망 위치로 이동이 완료된 후 정찰을 시작하게 하기 위해 정찰 위치를 도망 위치로 설정
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AS_AIController::PatrolPosKey, RunawayLocation);
 		// 디버그용: 도망가는 경로 표시
 		DrawDebugLine(ControllingPawn->GetWorld(), Center, RunawayLocation, FColor::Green, false, 1.0f);
 	}

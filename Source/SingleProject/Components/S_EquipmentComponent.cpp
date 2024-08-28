@@ -58,7 +58,8 @@ void US_EquipmentComponent::EquipItem(const ESlotName SlotName, const FName& Soc
 		ItemMesh->SetStaticMesh(Item->ItemAssetData.Mesh);
 		ItemMesh->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 		ItemMesh->RegisterComponent();
-
+		EquipmentTotalDamage += Item->ItemStatistics.DamageValue;
+		EquipmentTotalArmor += Item->ItemStatistics.ArmorRating;
 		SocketEquippedItems.Add(SocketName, ItemMesh);
 	}
 
@@ -96,6 +97,8 @@ void US_EquipmentComponent::UnequipItem(const ESlotName SlotName , const FName& 
 
 	ItemMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	ItemMesh->UnregisterComponent();
+	EquipmentTotalDamage -= RemovedItem->ItemStatistics.DamageValue;
+	EquipmentTotalArmor -= RemovedItem->ItemStatistics.ArmorRating;
 
 	OnEquipmentUpdated.Broadcast();
 }

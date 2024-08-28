@@ -3,6 +3,7 @@
 
 #include "S_EnemyBase.h"
 #include "SingleProject/Enemy/AIController/S_AIController.h"
+#include "Enemy/AIController/S_AIController.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -68,6 +69,7 @@ float AS_EnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 void AS_EnemyBase::SetDead()
 {
+	Cast<AS_AIController>(GetController())->StopAI();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);

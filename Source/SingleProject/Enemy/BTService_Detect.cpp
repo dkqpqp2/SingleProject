@@ -7,6 +7,7 @@
 #include "Enemy/S_EnemyBase.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"
 
@@ -105,8 +106,9 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				}
 			}
 		}
-
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
-		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 	}
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
+	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	Enemy->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }

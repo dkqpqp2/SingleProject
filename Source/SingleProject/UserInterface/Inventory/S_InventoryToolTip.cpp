@@ -67,15 +67,11 @@ void US_InventoryToolTip::NativeConstruct()
 	ItemDescription->SetText((FText::FromString(ItemBeingHovered->ItemTextData.Description.ToString())));
 
 	
-	const FString ArmorInfo = { TEXT("방어력: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.ArmorRating) };
-	//ArmorRating->SetText(FText::FromString(ArmorInfo));
+	const FString ArmorInfo = { TEXT("Armor: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.ArmorRating) };
+	ArmorRating->SetText(FText::FromString(ArmorInfo));
 
-	const FString DamageInfo = { TEXT("데미지: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.DamageValue) };
-	//DamageValue->SetText(FText::FromString(DamageInfo));
-
-	DamageValue->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.DamageValue));
-	ArmorRating->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.ArmorRating));
-	
+	const FString DamageInfo = { TEXT("Damage: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.DamageValue) };
+	DamageValue->SetText(FText::FromString(DamageInfo));
 
 	const FString WeightInfo = { TEXT("무게: ") + FString::SanitizeFloat(ItemBeingHovered->GetItemStackWeight()) };
 
