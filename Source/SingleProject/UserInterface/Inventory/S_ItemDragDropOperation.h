@@ -22,4 +22,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<US_InventoryComponent> SourceInventory;
+
+	UPROPERTY()
+	TObjectPtr<class US_EquipmentComponent> EquipmentInventory;
 };

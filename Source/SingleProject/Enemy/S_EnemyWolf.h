@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/S_EnemyBase.h"
-#include "S_EnemyDeer.generated.h"
+#include "S_EnemyWolf.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SINGLEPROJECT_API AS_EnemyDeer : public AS_EnemyBase
+class SINGLEPROJECT_API AS_EnemyWolf : public AS_EnemyBase
 {
 	GENERATED_BODY()
+	
 public:
-	AS_EnemyDeer();
+	AS_EnemyWolf();
 
 protected:
 	virtual void BeginPlay() override;

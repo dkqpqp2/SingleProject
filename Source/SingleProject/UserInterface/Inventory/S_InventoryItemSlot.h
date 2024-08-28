@@ -39,7 +39,7 @@ protected:
 	TObjectPtr<class UBorder> ItemBorder;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
-	TObjectPtr<class UImage>ItemIcon;
+	TObjectPtr<class UImage> ItemIcon;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemQuantity;

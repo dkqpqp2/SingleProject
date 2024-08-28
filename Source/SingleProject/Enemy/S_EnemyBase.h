@@ -32,10 +32,13 @@ public:
 protected:
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxHp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CurrentHp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float AttackDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -54,4 +57,17 @@ protected:
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
+	virtual void AttackByAI() override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	virtual void SetDead();
+	void PlayDeadAnimation();
+
+	float DeadEventDelayTime = 3.0f;
+
 };

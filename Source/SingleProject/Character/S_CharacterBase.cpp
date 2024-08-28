@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Engine/DamageEvents.h"
 
 
 AS_CharacterBase::AS_CharacterBase()
@@ -17,7 +18,7 @@ AS_CharacterBase::AS_CharacterBase()
 
     // Capsule
     GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
-    GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+    GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 
     // Movement
     GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -31,7 +32,7 @@ AS_CharacterBase::AS_CharacterBase()
     // Mesh
     GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
     GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-    GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+    GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
     static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
     if (CharacterMeshRef.Object)
@@ -126,6 +127,59 @@ void AS_CharacterBase::ComboCheck()
         HasNextComboCommand = false;
     }
 
+}
+
+void AS_CharacterBase::AttackHitCheck()
+{
+    FHitResult OutHitResult;
+    // SCENE_QUERY_STAT : Unreal엔진이 제공 하는 분석툴에서 Attack이라는 태그로 우리가 수행하는 작업에 대해서 조사 할수있게 태그를 추가해줌
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+    const float AttackRange = 40.0f;
+    const float AttackRadius = 50.0f;
+    const float AttackDamage = 30.0f;
+    const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+    const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+    bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel4, FCollisionShape::MakeSphere(AttackRadius), Params);
+    if (HitDetected)
+    {
+        FDamageEvent DamageEvent;
+        OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+    }
+
+#if ENABLE_DRAW_DEBUG
+
+    FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+    float CapsuleHalfHeight = AttackRange * 0.5f;
+    FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+    DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+
+#endif
+}
+
+float AS_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    SetDead();
+
+    return DamageAmount;
+}
+
+void AS_CharacterBase::SetDead()
+{
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+    PlayDeadAnimation();
+    SetActorEnableCollision(false);
+}
+
+void AS_CharacterBase::PlayDeadAnimation()
+{
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    AnimInstance->StopAllMontages(0.0f);
+    AnimInstance->Montage_Play(DeadMontage, 1.0f);
 }
 
 

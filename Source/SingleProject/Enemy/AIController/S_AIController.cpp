@@ -9,6 +9,7 @@
 const FName AS_AIController::HomePosKey(TEXT("HomePos"));
 const FName AS_AIController::PatrolPosKey(TEXT("PatrolPos"));
 const FName AS_AIController::TargetKey(TEXT("Target"));
+const FName AS_AIController::RunawayLocationKey(TEXT("RunawayLocation"));
 
 AS_AIController::AS_AIController()
 {

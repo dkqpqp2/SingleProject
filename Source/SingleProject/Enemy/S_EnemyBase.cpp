@@ -4,8 +4,7 @@
 #include "S_EnemyBase.h"
 #include "SingleProject/Enemy/AIController/S_AIController.h"
 
-
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -22,6 +21,7 @@ AS_EnemyBase::AS_EnemyBase()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enmey"));
 
 	CurrentEnemyType = EEnemyType::None;
 }
@@ -51,5 +51,32 @@ float AS_EnemyBase::GetAIAttackRange()
 float AS_EnemyBase::GetAITurnSpeed()
 {
 	return TurnSpeed;
+}
+
+void AS_EnemyBase::AttackByAI()
+{
+}
+
+float AS_EnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	SetDead();
+
+	return DamageAmount;
+}
+
+void AS_EnemyBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	PlayDeadAnimation();
+	SetActorEnableCollision(false);
+}
+
+void AS_EnemyBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 }
 

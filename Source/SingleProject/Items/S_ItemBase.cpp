@@ -133,6 +133,7 @@ void US_ItemBase::Use(AS_CharacterPlayer* Character, US_ItemBase* UseItem)
 		break;
 	case EItemType::Mundane:
 		break;
+	default:;
 	}
 	
 }

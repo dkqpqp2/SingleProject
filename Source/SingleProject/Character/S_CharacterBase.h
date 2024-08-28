@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/S_AnimationAttackInterface.h"
 #include "S_CharacterBase.generated.h"
 
 UCLASS()
-class SINGLEPROJECT_API AS_CharacterBase : public ACharacter
+class SINGLEPROJECT_API AS_CharacterBase : public ACharacter, public IS_AnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -33,4 +34,15 @@ protected:
 
 	FTimerHandle ComboTimerHandle;
 	bool HasNextComboCommand = false;
+
+protected:
+	virtual void AttackHitCheck() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	virtual void SetDead();
+	void PlayDeadAnimation();
 };

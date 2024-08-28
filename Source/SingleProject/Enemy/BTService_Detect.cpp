@@ -64,6 +64,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				{
 					FVector DirectionToPlayer = (Pawn->GetActorLocation() - Center).GetSafeNormal();
 					float DotProduct = FVector::DotProduct(ForwardVector, DirectionToPlayer);
+
+					if (DotProduct > 0.5f)
+					{
+						OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
+						DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
+						return;
+					}
 				}
 
 			}

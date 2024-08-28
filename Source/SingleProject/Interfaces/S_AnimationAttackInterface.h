@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "S_AIInterface.generated.h"
+#include "S_AnimationAttackInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class US_AIInterface : public UInterface
+class US_AnimationAttackInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,17 +16,11 @@ class US_AIInterface : public UInterface
 /**
  * 
  */
-class SINGLEPROJECT_API IS_AIInterface
+class SINGLEPROJECT_API IS_AnimationAttackInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual float GetAIPatrolRadius();
-	virtual float GetAIDetectRange();
-	virtual float GetAIAttackRange();
-	virtual float GetAITurnSpeed();
-
-
-	virtual void AttackByAI();
+	virtual void AttackHitCheck() = 0;
 };

@@ -6,7 +6,10 @@
 #include "UserInterface/Inventory/S_InventoryItemSlot.h"
 #include "UserInterface/Inventory/S_ItemDragDropOperation.h"
 #include "Components/S_InventoryComponent.h"
+#include "Components/S_EquipmentComponent.h"
 #include "Character/S_CharacterPlayer.h"
+#include "Items/S_ItemBase.h"
+
 #include "Components/TextBlock.h"
 #include "Components/WrapBox.h"
 
@@ -65,12 +68,34 @@ void US_InventoryPanel::RefreshInventory()
 bool US_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 
-	const US_ItemDragDropOperation* ItemDragDrop = Cast<US_ItemDragDropOperation>(InOperation);
+	const US_ItemDragDropOperation* ItemDragDropOperation = Cast<US_ItemDragDropOperation>(InOperation);
 
-	if (ItemDragDrop->SourceItem && InventoryReference)
+	if (ItemDragDropOperation->SourceItem && InventoryReference)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Detected an item drop on InventoryPanel"));
-
+		switch (ItemDragDropOperation->SourceItem->ItemType)
+		{
+		case EItemType::Weapon:
+			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Weapon, TEXT("WeaponSocket"));
+			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
+			break;
+		case EItemType::Armor:
+			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Armor, TEXT("ArmorSocket"));
+			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
+			break;
+		case EItemType::Helmet:
+			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Helmet, TEXT("HelmetSocket"));
+			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
+			break;
+		case EItemType::Shield:
+			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Shield, TEXT("ShieldSocket"));
+			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
+			break;
+		case EItemType::Boots:
+			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Boots, TEXT("BootsSocket"));
+			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
+			break;
+		default:;
+		}
 		return true;
 	}
 	return false;

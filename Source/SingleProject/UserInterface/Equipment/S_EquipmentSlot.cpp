@@ -6,6 +6,7 @@
 #include "Items/S_ItemBase.h"
 #include "UserInterface/Inventory/S_ItemDragDropOperation.h"
 #include "UserInterface/Inventory/S_InventoryItemSlot.h"
+#include "UserInterface/Inventory/S_DragItemVisual.h"
 
 #include "Components/Border.h"
 #include "Components/Image.h"
@@ -54,6 +55,7 @@ void US_EquipmentSlot::NativeConstruct()
 		{ESlotName::Shield, TEXT("ShieldSocket") },
 		{ESlotName::Boots, TEXT("BootsSocket") },
 	};
+
 }
 
 FReply US_EquipmentSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -79,7 +81,7 @@ void US_EquipmentSlot::OnItemClicked()
 	//OwningPlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningLocalPlayer());
 	if (OwningPlayerCharacter && EquippedItem)
 	{
-		US_InventoryComponent* InventoryComponent = OwningPlayerCharacter->FindComponentByClass<US_InventoryComponent>();
+		InventoryComponent = OwningPlayerCharacter->FindComponentByClass<US_InventoryComponent>();
 		if (InventoryComponent)
 		{
 			InventoryComponent->HandleAddItem(EquippedItem);
@@ -87,10 +89,10 @@ void US_EquipmentSlot::OnItemClicked()
 			EquippedItem = nullptr;
 		}
 
-		US_EquipmentComponent* EquipmentComponent = OwningPlayerCharacter->FindComponentByClass<US_EquipmentComponent>();
+		EquipmentComponent = OwningPlayerCharacter->FindComponentByClass<US_EquipmentComponent>();
 		if (EquipmentComponent)
 		{			
-			ESlotName SlotName = EquipmentComponent->GetSlotNames();
+			ESlotName SlotName = GetSlotName();
 
 			if (SlotToSocketMap.Contains(SlotName))
 			{
@@ -111,12 +113,62 @@ void US_EquipmentSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 void US_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-	
+	if (DragItemVisualClass)
+	{
+		const TObjectPtr<US_DragItemVisual> DragVisual = CreateWidget<US_DragItemVisual>(this, DragItemVisualClass);
+
+		DragVisual->ItemIcon->SetBrushFromTexture(EquippedItem->ItemAssetData.Icon);
+		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
+
+		EquippedItem->ItemNumericData.bIsStackable
+			? DragVisual->ItemQuantity->SetText(FText::AsNumber(EquippedItem->Quantity))
+			: DragVisual->ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
+
+		US_ItemDragDropOperation* DragItemOperation = NewObject<US_ItemDragDropOperation>();
+
+		DragItemOperation->SourceItem = EquippedItem;
+		DragItemOperation->EquipmentInventory = EquippedItem->OwningEquipment;
+
+		DragItemOperation->DefaultDragVisual = DragVisual;
+		DragItemOperation->Pivot = EDragPivot::TopLeft;
+
+		OutOperation = DragItemOperation;
+	}
 }
 
 bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	const US_ItemDragDropOperation* ItemDragDropOperation = Cast<US_ItemDragDropOperation>(InOperation);
+
+	if (ItemDragDropOperation && ItemDragDropOperation->SourceItem)
+	{
+		switch (ItemDragDropOperation->SourceItem->ItemType)
+		{
+		case EItemType::Weapon:
+			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), ItemDragDropOperation->SourceItem);
+			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
+			break;
+		case EItemType::Armor:
+			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Armor, TEXT("ArmorSocket"), ItemDragDropOperation->SourceItem);
+			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
+			break;
+		case EItemType::Helmet:
+			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Helmet, TEXT("HelmetSocket"), ItemDragDropOperation->SourceItem);
+			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
+			break;
+		case EItemType::Shield:
+			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Shield, TEXT("ShieldSocket"), ItemDragDropOperation->SourceItem);
+			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
+			break;
+		case EItemType::Boots:
+			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Boots, TEXT("BootsSocket"), ItemDragDropOperation->SourceItem);
+			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
+			break;
+		default:;
+		}
+		return true;
+	}
+	return false;
 }
 
 void US_EquipmentSlot::UpdateSlot()

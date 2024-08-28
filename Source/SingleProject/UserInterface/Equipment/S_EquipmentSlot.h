@@ -20,6 +20,9 @@ public:
 	void SetItemReference(US_ItemBase* ItemIn) { EquippedItem = ItemIn; };
 	TObjectPtr<US_ItemBase> GetItemReference() const { return EquippedItem; };
 
+	void SetSlotName(ESlotName InSlotName) { SlotWidgetName = InSlotName; }
+	ESlotName GetSlotName() const { return SlotWidgetName; }
+
 	void UpdateSlot();
 
 	void OnItemClicked();
@@ -38,6 +41,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment", meta = (ExposeOnSpawn = "true"))
 	TObjectPtr<class UTexture2D> EmptyTexture;
+
+	UPROPERTY()
+	US_InventoryComponent* InventoryComponent;
+
+	UPROPERTY()
+	US_EquipmentComponent* EquipmentComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
+	TSubclassOf<class US_DragItemVisual> DragItemVisualClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
+	TSubclassOf<class US_InventoryToolTip> ToolTipClass;
+
+	UPROPERTY()
+	TObjectPtr<class AS_CharacterPlayer> PlayerCharacter;
 
 	TMap<ESlotName, FName> SlotToSocketMap;
 

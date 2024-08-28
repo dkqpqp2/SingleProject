@@ -5,6 +5,9 @@
 #include "UserInterface/Equipment/S_EquipmentSlot.h"
 #include "Character/S_CharacterPlayer.h"
 #include "Components/S_EquipmentComponent.h"
+#include "UserInterface/Inventory/S_ItemDragDropOperation.h"
+#include "Components/S_InventoryComponent.h"
+
 #include "Components/TextBlock.h"
 #include "Items/S_ItemBase.h"
 
@@ -22,6 +25,13 @@ void US_EquipmentPanel::NativeConstruct()
          {ESlotName::Shield, ShieldSlot},
          {ESlotName::Boots, BootsSlot}
     };
+
+    // 각 슬롯에 SlotName을 설정해줌
+    WeaponSlot->SetSlotName(ESlotName::Weapon);
+    HelmetSlot->SetSlotName(ESlotName::Helmet);
+    ArmorSlot->SetSlotName(ESlotName::Armor);
+    ShieldSlot->SetSlotName(ESlotName::Shield);
+    BootsSlot->SetSlotName(ESlotName::Boots);
 }
 
 void US_EquipmentPanel::NativeOnInitialized()
@@ -39,6 +49,19 @@ void US_EquipmentPanel::NativeOnInitialized()
     }
 }
 
+bool US_EquipmentPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+    const US_ItemDragDropOperation* ItemDragDrop = Cast<US_ItemDragDropOperation>(InOperation);
+
+    if (ItemDragDrop && ItemDragDrop->SourceItem)
+    {
+        ItemDragDrop->SourceItem->Use(PlayerCharacter, ItemDragDrop->SourceItem);
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("Damege: %s || Armor: %s"), ItemDragDrop->SourceItem->ItemStatistics.DamageValue, ItemDragDrop->SourceItem->ItemStatistics.ArmorRating));
+        return true;
+    }
+    return false;
+}
+
 void US_EquipmentPanel::InitializeSlots()
 {
     for (const auto& SlotWidgetPair : SlotWidgetMap)
@@ -49,26 +72,7 @@ void US_EquipmentPanel::InitializeSlots()
             SlotWidget->UpdateSlot();
         }
     }
-    /*if (WeaponSlot)
-    {
-        WeaponSlot->UpdateSlot();
-    }
-    if (HelmetSlot)
-    {
-        HelmetSlot->UpdateSlot();
-    }
-    if (ArmorSlot)
-    {
-        ArmorSlot->UpdateSlot();
-    }
-    if (ShieldSlot)
-    {
-        ShieldSlot->UpdateSlot();
-    }
-    if (BootsSlot)
-    {
-        BootsSlot->UpdateSlot();
-    }*/
+
 }
 
 void US_EquipmentPanel::SetInfoText() const

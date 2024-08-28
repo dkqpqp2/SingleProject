@@ -41,6 +41,8 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<class US_EquipmentComponent> OwningEquipment;
+	UPROPERTY()
+	TObjectPtr<class US_InventoryComponent> OwningInventory;
 
 	UPROPERTY()
 	TSubclassOf<class US_EquipmentSlot> EquipmentSlotClass;
@@ -58,4 +60,6 @@ protected:
 	void InitializeSlots();
 
 	void SetInfoText()const;
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };
