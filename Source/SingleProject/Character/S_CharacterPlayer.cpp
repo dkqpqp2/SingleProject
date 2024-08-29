@@ -13,6 +13,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "PaperSpriteComponent.h"
+#include "Blueprint/UserWidget.h"
 
 //Input
 #include "InputActionValue.h"
@@ -42,6 +45,22 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	MiniMapArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MiniMapArm"));
+	MiniMapArm->SetupAttachment(RootComponent);
+	MiniMapArm->SetWorldRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+
+	SceneCaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComp"));
+	SceneCaptureComp->SetupAttachment(MiniMapArm);
+	SceneCaptureComp->ProjectionType = ECameraProjectionMode::Orthographic;
+
+	MiniMapArrow = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MiniMapArrow"));
+	MiniMapArrow->SetupAttachment(RootComponent);
+
+	MiniMapArrow->SetWorldRotation(FRotator::MakeFromEuler(FVector(90.0f, 0.0f, -90.0f)));
+
+	MiniMapArrow->bVisibleInSceneCaptureOnly = true;
+
 
 	AimingCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("AimingCameraTimeline"));
 	DefaultCameraLocation = FVector{ 0.0f, 0.0f, 65.0f };
@@ -123,6 +142,16 @@ void AS_CharacterPlayer::BeginPlay()
 	{
 		AimingCameraTimeline->AddInterpFloat(AimingCameraCurve, AimLerpAlphaValue);
 		AimingCameraTimeline->SetTimelineFinishedFunc(TimelineFinishedEvent);
+	}
+
+	if (MiniMapWidgetClass)
+	{
+		MiniMapWidget = CreateWidget<UUserWidget>(GetWorld(), MiniMapWidgetClass);
+
+		if (MiniMapWidget)
+		{
+			MiniMapWidget->AddToViewport();
+		}
 	}
 }
 

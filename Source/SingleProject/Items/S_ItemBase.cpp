@@ -124,7 +124,6 @@ void US_ItemBase::Use(AS_CharacterPlayer* Character, US_ItemBase* UseItem)
 	case EItemType::Boots:
 		OwningEquipment->EquipItem(ESlotName::Boots, TEXT("BootsSocket"), UseItem);
 		OwningInventory->RemoveAmountOfItem(UseItem, Quantity);
-		EquipmentSlot->SetItemReference(UseItem);
 		break;
 	case EItemType::Consumable:
 		OwningInventory->RemoveAmountOfItem(UseItem, 1);

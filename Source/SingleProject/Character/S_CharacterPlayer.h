@@ -62,6 +62,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "ture"))
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap)
+	TObjectPtr<class USpringArmComponent> MiniMapArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap)
+	TObjectPtr<class USceneCaptureComponent2D> SceneCaptureComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap)
+	TObjectPtr<class UPaperSpriteComponent> MiniMapArrow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MiniMap)
+	TSubclassOf<UUserWidget> MiniMapWidgetClass;
+
+	TObjectPtr<class UUserWidget> MiniMapWidget;
+
 // 상호작용
 protected:
 	UPROPERTY()

@@ -114,6 +114,8 @@ US_ItemBase* US_EquipmentComponent::GetEquippedItem(const ESlotName  SlotName) c
 
 bool US_EquipmentComponent::IsSlotOccupied(const ESlotName  SlotName) const
 {
-	return EquippedItems.Contains(SlotName);
+	bool bIsOccupied = EquippedItems.Contains(SlotName);
+	UE_LOG(LogTemp, Warning, TEXT("IsSlotOccupied: Slot %s is %s"), *StaticEnum<ESlotName>()->GetValueAsString(SlotName), bIsOccupied ? TEXT("Occupied") : TEXT("Empty"));
+	return bIsOccupied;
 }
 

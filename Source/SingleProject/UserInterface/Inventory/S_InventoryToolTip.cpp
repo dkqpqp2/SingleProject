@@ -30,6 +30,9 @@ void US_InventoryToolTip::NativeConstruct()
 		ArmorRating->SetVisibility(ESlateVisibility::Visible);
 		break;
 	case EItemType::Shield:
+		ItemType->SetText(FText::FromString(TEXT("방패")));
+		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
+		ArmorRating->SetVisibility(ESlateVisibility::Visible);
 		break;
 	case EItemType::Spell:
 		ItemType->SetText(FText::FromString(TEXT("마법 아이템")));

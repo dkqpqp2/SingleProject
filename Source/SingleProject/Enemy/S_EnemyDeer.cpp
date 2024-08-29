@@ -47,6 +47,7 @@ void AS_EnemyDeer::BeginPlay()
 
 void AS_EnemyDeer::SetDead()
 {
+	Super::SetDead();
 	FTimerHandle DeadTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
 		[&]()
@@ -54,4 +55,6 @@ void AS_EnemyDeer::SetDead()
 			Destroy();
 		}
 	), DeadEventDelayTime, false);
+
+	DropItem();
 }

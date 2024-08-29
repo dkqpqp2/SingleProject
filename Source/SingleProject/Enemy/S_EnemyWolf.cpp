@@ -55,4 +55,6 @@ void AS_EnemyWolf::SetDead()
 			Destroy();
 		}
 	), DeadEventDelayTime, false);
+
+	DropItem();
 }

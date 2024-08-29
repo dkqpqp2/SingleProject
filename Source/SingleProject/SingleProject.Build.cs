@@ -23,7 +23,8 @@ public class SingleProject : ModuleRules
             "AIModule",
             "GamePlayTasks",
             "SlateCore",
-            "Slate"
+            "Slate",
+            "Paper2D"
 
         });
 	}

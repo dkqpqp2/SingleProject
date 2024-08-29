@@ -4,6 +4,8 @@
 #include "S_EnemyBase.h"
 #include "SingleProject/Enemy/AIController/S_AIController.h"
 #include "Enemy/AIController/S_AIController.h"
+#include "Items/S_ItemBase.h"
+#include "World/S_Pickup.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -80,5 +82,42 @@ void AS_EnemyBase::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+}
+
+void AS_EnemyBase::DropItem()
+{
+	if(ItemDropTables.Num() == 0)
+	{
+		return;
+	}
+
+	UDataTable* SelectedTable = ItemDropTables[FMath::RandRange(0, ItemDropTables.Num() - 1)];
+	if (!SelectedTable)
+	{
+		return;
+	}
+
+	TArray<FName> RowNames = SelectedTable->GetRowNames();
+	if (RowNames.Num() == 0)
+	{
+		return;
+	}
+
+	FName SelectedRowName = RowNames[FMath::RandRange(0, RowNames.Num() - 1)];
+
+	const FItemData* ItemData = SelectedTable->FindRow<FItemData>(SelectedRowName, "");
+	if (ItemData)
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 50);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		AS_Pickup* SpawnedPickup = GetWorld()->SpawnActor<AS_Pickup>(PickupClass, SpawnLocation, SpawnRotation);
+		if (SpawnedPickup)
+		{
+			SpawnedPickup->SetItemDataTable(SelectedTable);
+			SpawnedPickup->SetInDesiredItemID(SelectedRowName);
+			SpawnedPickup->InitializePickup(US_ItemBase::StaticClass(), 1);
+		}
+	}
 }
 

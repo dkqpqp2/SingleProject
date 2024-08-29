@@ -25,6 +25,9 @@ public:
 
 	TObjectPtr<US_ItemBase> GetItemData() { return ItemReference; }
 
+	void SetInDesiredItemID(FName InDesiredItemID) { DesiredItemID = InDesiredItemID; }
+	void SetItemDataTable(UDataTable* InItemDataTable) { ItemDataTable = InItemDataTable; }
+
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
 	virtual void Interact(AS_CharacterPlayer* PlayerCharcater) override;

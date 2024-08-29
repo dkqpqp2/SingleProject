@@ -70,4 +70,12 @@ protected:
 
 	float DeadEventDelayTime = 3.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = ItemData)
+	TSubclassOf<class AS_Pickup> PickupClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ItemData)
+	TArray<TObjectPtr<UDataTable>> ItemDropTables;
+
+	void DropItem();
+
 };
