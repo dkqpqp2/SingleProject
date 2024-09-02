@@ -7,7 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimMontage.h"
-#include "Engine/DamageEvents.h"
+
 
 
 AS_CharacterBase::AS_CharacterBase()
@@ -131,41 +131,7 @@ void AS_CharacterBase::ComboCheck()
 
 void AS_CharacterBase::AttackHitCheck()
 {
-    FHitResult OutHitResult;
-    // SCENE_QUERY_STAT : Unreal엔진이 제공 하는 분석툴에서 Attack이라는 태그로 우리가 수행하는 작업에 대해서 조사 할수있게 태그를 추가해줌
-    FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-
-    const float AttackRange = 40.0f;
-    const float AttackRadius = 50.0f;
-    const float AttackDamage = 30.0f;
-    const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-    const FVector End = Start + GetActorForwardVector() * AttackRange;
-
-    bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel4, FCollisionShape::MakeSphere(AttackRadius), Params);
-    if (HitDetected)
-    {
-        FDamageEvent DamageEvent;
-        OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-    }
-
-#if ENABLE_DRAW_DEBUG
-
-    FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-    float CapsuleHalfHeight = AttackRange * 0.5f;
-    FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-
-    DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
-
-#endif
-}
-
-float AS_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-    Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-    SetDead();
-
-    return DamageAmount;
+    
 }
 
 void AS_CharacterBase::SetDead()

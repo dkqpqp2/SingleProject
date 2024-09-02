@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/S_AIInterface.h"
+#include "Interfaces/S_AnimationAttackInterface.h"
+#include "Interfaces/S_EnemyWidgetInterface.h"
 #include "S_EnemyBase.generated.h"
 
 UENUM()
@@ -18,7 +20,7 @@ enum class EEnemyType : uint8
 };
 
 UCLASS()
-class SINGLEPROJECT_API AS_EnemyBase : public ACharacter, public IS_AIInterface
+class SINGLEPROJECT_API AS_EnemyBase : public ACharacter, public IS_AIInterface, public IS_AnimationAttackInterface, public IS_EnemyWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -26,14 +28,22 @@ public:
 	// Sets default values for this character's properties
 	AS_EnemyBase();
 
+	virtual void PostInitializeComponents() override;
+
 	UPROPERTY(VisibleAnywhere)
 	EEnemyType CurrentEnemyType;
+
+	float GetMaxHp() { return MaxHp; }
+	void SetMaxHp(float InMaxHp) { MaxHp = InMaxHp; }
+
+protected:
+	virtual void BeginPlay() override;
 
 protected:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxHp;
+	float MaxHp = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CurrentHp;
@@ -53,6 +63,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HpBarOffSet)
+	float AIHpBarOffSet;
+
+	TObjectPtr<class UAnimInstance> AnimInstance;
+
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIAttackRange() override;
@@ -60,10 +75,17 @@ protected:
 	virtual void AttackByAI() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	virtual void AttackHitCheck();
+	virtual void PlayAttackMontage();
+	virtual void AttackActionEnd(class UAnimMontage* TargetMontage, bool InProperlyEnded);
+	virtual void NotifyAttackActionEnd();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> AttackMontage;
 
 	virtual void SetDead();
 	void PlayDeadAnimation();
@@ -78,4 +100,12 @@ protected:
 
 	void DropItem();
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class US_EnemyStatComponent> Stat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class US_AIWidgetComponent> AIHpBar;
+
+	virtual void SetupEnemyWidget(class US_AIUserWidget* InWidget) override;
 };

@@ -13,9 +13,8 @@ class US_AIInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
+DECLARE_DELEGATE(FAIEnemyAttackFinished);
+
 class SINGLEPROJECT_API IS_AIInterface
 {
 	GENERATED_BODY()
@@ -28,5 +27,6 @@ public:
 	virtual float GetAITurnSpeed();
 
 
+	virtual void SetAIAttackDelegate(const FAIEnemyAttackFinished& InOnAttackFinished);
 	virtual void AttackByAI();
 };

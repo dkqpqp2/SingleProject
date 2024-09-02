@@ -5,6 +5,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/DamageEvents.h"
 
 AS_EnemyWolf::AS_EnemyWolf()
 {
@@ -41,6 +42,7 @@ AS_EnemyWolf::AS_EnemyWolf()
 void AS_EnemyWolf::BeginPlay()
 {
 	Super::BeginPlay();
+	SetMaxHp(MaxHp);
 	CurrentHp = MaxHp;
 }
 
@@ -57,4 +59,52 @@ void AS_EnemyWolf::SetDead()
 	), DeadEventDelayTime, false);
 
 	DropItem();
+}
+
+void AS_EnemyWolf::SetAIAttackDelegate(const FAIEnemyAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AS_EnemyWolf::AttackHitCheck()
+{
+	Super::AttackHitCheck();
+	FHitResult OutHitResult;
+	// SCENE_QUERY_STAT : Unreal엔진이 제공 하는 분석툴에서 Attack이라는 태그로 우리가 수행하는 작업에 대해서 조사 할수있게 태그를 추가해줌
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float EnemyAttackRange = AttackRange;
+	const float EnemyAttackRadius = 30.0f;
+	const float EnemyAttackDamage = AttackDamage;
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * EnemyAttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel4, FCollisionShape::MakeSphere(EnemyAttackRadius), Params);
+	if (HitDetected)
+	{
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(EnemyAttackDamage, DamageEvent, GetController(), this);
+	}
+
+#if ENABLE_DRAW_DEBUG
+
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = EnemyAttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, EnemyAttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+	DrawDebugPoint(GetWorld(), Start, 20.0f, FColor::Red, false, 10.0f);
+
+#endif
+}
+
+void AS_EnemyWolf::AttackByAI()
+{
+	PlayAttackMontage();
+}
+
+void AS_EnemyWolf::NotifyAttackActionEnd()
+{
+	Super::NotifyAttackActionEnd();
+	OnAttackFinished.ExecuteIfBound();
 }

@@ -7,15 +7,20 @@
 #include "Components/S_EquipmentComponent.h"
 #include "World/S_Pickup.h"
 #include "Items/S_ItemBase.h"
+#include "Components/S_CharacterStatComponent.h"
 
 //Engine
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "PaperSpriteComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/DamageEvents.h"
+#include "Components/S_WidgetComponent.h"
+#include "UserInterface/UI/S_HpBarWidget.h"
 
 //Input
 #include "InputActionValue.h"
@@ -115,10 +120,31 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 		AttackAction = InputActionAttackRef.Object;
 	}
 
+	Stat = CreateDefaultSubobject<US_CharacterStatComponent>(TEXT("Stat"));
+
+	HpBar = CreateDefaultSubobject<US_WidgetComponent>(TEXT("HpBar"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/Character/UserInterface/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	InteractionCheckFrequency = 0.1;
 	InteractionCheckDistance = 225.0f;
 
 	BaseEyeHeight = 76.0f;
+}
+
+void AS_CharacterPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	Stat->OnHpZero.AddUObject(this, &AS_CharacterPlayer::SetDead);
 }
 
 void AS_CharacterPlayer::BeginPlay()
@@ -302,6 +328,60 @@ void AS_CharacterPlayer::Interact()
 	}
 }
 
+void AS_CharacterPlayer::AttackHitCheck()
+{
+	Super::AttackHitCheck();
+	FHitResult OutHitResult;
+	// SCENE_QUERY_STAT : Unreal엔진이 제공 하는 분석툴에서 Attack이라는 태그로 우리가 수행하는 작업에 대해서 조사 할수있게 태그를 추가해줌
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float AttackRange = 40.0f;
+	const float AttackRadius = 50.0f;
+	const float AttackDamage = PlayerEquipment->GetEquipmentTotalDamage();
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel4, FCollisionShape::MakeSphere(AttackRadius), Params);
+	if (HitDetected)
+	{
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+	}
+
+#if ENABLE_DRAW_DEBUG
+
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+
+#endif
+}
+
+float AS_CharacterPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Cyan, FString::Printf(TEXT("EnemyDamage : %f"), DamageAmount));
+
+	float Damage = DamageAmount - PlayerEquipment->GetEquipmentTotalArmor();
+	if (Damage <= 0.0f)
+	{
+		Damage = 1.0f;
+
+		Stat->ApplyDamage(Damage);
+	}
+	else
+	{
+		Stat->ApplyDamage(Damage);
+	}
+	
+	//SetDead();
+
+	return Damage;
+}
+
 void AS_CharacterPlayer::UpdateInteractionWidget() const
 {
 	if (IsValid(TargetInteractable.GetObject()))
@@ -390,6 +470,17 @@ void AS_CharacterPlayer::DropItem(US_ItemBase* ItemToDrop, const int32 QuantityT
 	}
 }
 
+void AS_CharacterPlayer::SetupCharacterWidget(US_UserWidget* InUserWidget)
+{
+	US_HpBarWidget* HpBarWidget = Cast<US_HpBarWidget>(InUserWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
+		Stat->OnHpChanged.AddUObject(HpBarWidget, &US_HpBarWidget::UpdateHpBar);
+	}
+}
+
 void AS_CharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -434,4 +525,11 @@ void AS_CharacterPlayer::Look(const FInputActionValue& Value)
 void AS_CharacterPlayer::Attack()
 {
 	ProcessComboCommand();
+}
+
+void AS_CharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	HpBar->SetHiddenInGame(true);
 }

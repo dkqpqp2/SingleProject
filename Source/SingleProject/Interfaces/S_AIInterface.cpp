@@ -25,6 +25,10 @@ float IS_AIInterface::GetAITurnSpeed()
     return 0.0f;
 }
 
+void IS_AIInterface::SetAIAttackDelegate(const FAIEnemyAttackFinished& InOnAttackFinished)
+{
+}
+
 void IS_AIInterface::AttackByAI()
 {
 }

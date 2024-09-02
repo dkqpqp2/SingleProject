@@ -6,9 +6,13 @@
 #include "Enemy/AIController/S_AIController.h"
 #include "Items/S_ItemBase.h"
 #include "World/S_Pickup.h"
+#include "Components/S_EnemyStatComponent.h"
+#include "Enemy/UI/S_AIHpBarWidget.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/S_AIWidgetComponent.h"
+
 
 // Sets default values
 AS_EnemyBase::AS_EnemyBase()
@@ -26,7 +30,37 @@ AS_EnemyBase::AS_EnemyBase()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enmey"));
 
+	Stat = CreateDefaultSubobject<US_EnemyStatComponent>(TEXT("Stat"));
+
+
+	AIHpBar = CreateDefaultSubobject<US_AIWidgetComponent>(TEXT("AIHpBar"));
+	AIHpBar->SetupAttachment(GetMesh());
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> AIHpBarWidgetRef(TEXT("/Game/Character/Blueprints/Enemy/WBP_EnemyHpBar.WBP_EnemyHpBar_C"));
+	if (AIHpBarWidgetRef.Class)
+	{
+		AIHpBar->SetWidgetClass(AIHpBarWidgetRef.Class);
+		AIHpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		AIHpBar->SetDrawSize(FVector2D(120.0f, 12.0f));
+		AIHpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+
 	CurrentEnemyType = EEnemyType::None;
+}
+
+void AS_EnemyBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	Stat->OnAIHpZero.AddUObject(this, &AS_EnemyBase::SetDead);
+}
+
+void AS_EnemyBase::BeginPlay()
+{
+	Super::BeginPlay();
+	SetMaxHp(MaxHp);
+	AIHpBar->SetRelativeLocation(FVector(0.0f, 0.0f, AIHpBarOffSet));
 }
 
 // Called every frame
@@ -64,9 +98,34 @@ float AS_EnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	SetDead();
+	Stat->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
+}
+
+void AS_EnemyBase::AttackHitCheck()
+{
+	
+}
+
+void AS_EnemyBase::PlayAttackMontage()
+{
+	AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(AttackMontage, 1.0f);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &AS_EnemyBase::AttackActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, AttackMontage);
+}
+
+void AS_EnemyBase::AttackActionEnd(UAnimMontage* TargetMontage, bool InProperlyEnded)
+{
+	NotifyAttackActionEnd();
+}
+
+void AS_EnemyBase::NotifyAttackActionEnd()
+{
 }
 
 void AS_EnemyBase::SetDead()
@@ -79,7 +138,7 @@ void AS_EnemyBase::SetDead()
 
 void AS_EnemyBase::PlayDeadAnimation()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 }
@@ -116,8 +175,33 @@ void AS_EnemyBase::DropItem()
 		{
 			SpawnedPickup->SetItemDataTable(SelectedTable);
 			SpawnedPickup->SetInDesiredItemID(SelectedRowName);
-			SpawnedPickup->InitializePickup(US_ItemBase::StaticClass(), 1);
+			switch (ItemData->ItemType)
+			{
+			case EItemType::Weapon:
+			case EItemType::Armor:
+			case EItemType::Helmet:
+			case EItemType::Shield:
+			case EItemType::Boots:
+				SpawnedPickup->InitializePickup(US_ItemBase::StaticClass(), 1);
+				break;
+			default:
+				int32 Random = FMath::RandRange(1, 10);
+				SpawnedPickup->InitializePickup(US_ItemBase::StaticClass(), Random);
+				break;
+			}
+			
 		}
+	}
+}
+
+void AS_EnemyBase::SetupEnemyWidget(US_AIUserWidget* InWidget)
+{
+	US_AIHpBarWidget* HpBarWidget = Cast<US_AIHpBarWidget>(InWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHp(Stat->GetMaxHp());
+		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
+		Stat->OnAIHpChanged.AddUObject(HpBarWidget, &US_AIHpBarWidget::UpdateHpBar);
 	}
 }
 

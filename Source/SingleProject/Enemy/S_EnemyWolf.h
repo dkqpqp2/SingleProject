@@ -20,4 +20,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void SetDead() override;
+
+	virtual void SetAIAttackDelegate(const FAIEnemyAttackFinished& InOnAttackFinished)override;
+	virtual void AttackHitCheck() override;
+	virtual void AttackByAI() override;
+	virtual void NotifyAttackActionEnd() override;
+
+	FAIEnemyAttackFinished OnAttackFinished;
+
 };

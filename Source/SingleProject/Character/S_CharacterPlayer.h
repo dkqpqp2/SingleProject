@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/S_CharacterBase.h"
 #include "Interfaces/S_InteractionInferface.h"
+#include "Interfaces/S_CharacterWidgetInterface.h"
 #include "S_CharacterPlayer.generated.h"
 
 struct FInputActionValue;
@@ -32,7 +33,7 @@ struct FInteractionData
  * 
  */
 UCLASS()
-class SINGLEPROJECT_API AS_CharacterPlayer : public AS_CharacterBase, public IS_InteractionInferface
+class SINGLEPROJECT_API AS_CharacterPlayer : public AS_CharacterBase, public IS_InteractionInferface, public IS_CharacterWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -76,6 +77,14 @@ protected:
 
 	TObjectPtr<class UUserWidget> MiniMapWidget;
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class US_CharacterStatComponent> Stat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class US_WidgetComponent> HpBar;
+
+	virtual void SetupCharacterWidget(class US_UserWidget* InUserWidget)override;
 // 상호작용
 protected:
 	UPROPERTY()
@@ -116,6 +125,9 @@ protected:
 	void EndInteract();
 	void Interact();
 
+	virtual void AttackHitCheck() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 
 // 입력
 protected:
@@ -144,6 +156,8 @@ protected:
 	TObjectPtr<class UInputAction> AttackAction;
 // 함수
 protected:
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -161,4 +175,5 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Attack();
+	virtual void SetDead() override;
 };

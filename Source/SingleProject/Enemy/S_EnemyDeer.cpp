@@ -42,6 +42,7 @@ AS_EnemyDeer::AS_EnemyDeer()
 void AS_EnemyDeer::BeginPlay()
 {
 	Super::BeginPlay();
+	SetMaxHp(MaxHp);
 	CurrentHp = MaxHp;
 }
 

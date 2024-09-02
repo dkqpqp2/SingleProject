@@ -36,8 +36,8 @@ protected:
 	bool HasNextComboCommand = false;
 
 protected:
-	virtual void AttackHitCheck() override;
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void AttackHitCheck();
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
