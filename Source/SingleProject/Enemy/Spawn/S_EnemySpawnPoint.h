@@ -14,6 +14,18 @@ class SINGLEPROJECT_API AS_EnemySpawnPoint : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AS_EnemySpawnPoint();
+protected:
+	TObjectPtr<class USceneComponent> Root;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<class AS_EnemyBase>> SpawnClass;
+
+	TObjectPtr<class AS_EnemyBase> SpawnEnemy;
+
+	UPROPERTY(EditAnywhere)
+	float SpawnTime;
+
+	float AccTime;
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,4 +35,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	void Spawn();
+
+public:
+	void ClearSpawnObject();
 };

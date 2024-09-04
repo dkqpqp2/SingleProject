@@ -8,6 +8,7 @@
 #include "World/S_Pickup.h"
 #include "Components/S_EnemyStatComponent.h"
 #include "Enemy/UI/S_AIHpBarWidget.h"
+#include "Enemy/Spawn/S_EnemySpawnPoint.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -54,12 +55,14 @@ void AS_EnemyBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	Stat->OnAIHpZero.AddUObject(this, &AS_EnemyBase::SetDead);
+
+	SetMaxHp(MaxHp);
 }
 
 void AS_EnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	SetMaxHp(MaxHp);
+
 	AIHpBar->SetRelativeLocation(FVector(0.0f, 0.0f, AIHpBarOffSet));
 }
 
@@ -134,6 +137,11 @@ void AS_EnemyBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);
+	if (SpawnPoint)
+	{
+		SpawnPoint->ClearSpawnObject();
+	}
+	
 }
 
 void AS_EnemyBase::PlayDeadAnimation()

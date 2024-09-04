@@ -36,6 +36,13 @@ public:
 	float GetMaxHp() { return MaxHp; }
 	void SetMaxHp(float InMaxHp) { MaxHp = InMaxHp; }
 
+	TObjectPtr<class AS_EnemySpawnPoint> SpawnPoint;
+
+	void SetSpawnPoint(class AS_EnemySpawnPoint* Point)
+	{
+		SpawnPoint = Point;
+	}
+
 protected:
 	virtual void BeginPlay() override;
 

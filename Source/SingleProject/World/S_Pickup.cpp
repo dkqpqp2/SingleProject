@@ -14,6 +14,7 @@ AS_Pickup::AS_Pickup()
 		PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
 		PickupMesh->SetSimulatePhysics(true);
 		SetRootComponent(PickupMesh);
+
 }
 
 void AS_Pickup::BeginPlay()

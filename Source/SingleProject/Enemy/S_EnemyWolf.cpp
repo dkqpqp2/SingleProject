@@ -93,7 +93,6 @@ void AS_EnemyWolf::AttackHitCheck()
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 
 	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, EnemyAttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
-	DrawDebugPoint(GetWorld(), Start, 20.0f, FColor::Red, false, 10.0f);
 
 #endif
 }

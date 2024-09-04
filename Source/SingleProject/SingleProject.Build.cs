@@ -24,7 +24,8 @@ public class SingleProject : ModuleRules
             "GamePlayTasks",
             "SlateCore",
             "Slate",
-            "Paper2D"
+            "Paper2D",
+			"ApexDestruction"
 
         });
 	}
