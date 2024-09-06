@@ -32,14 +32,32 @@ public:
 		AActor* DamageCauser
 	) override;
 
+	TObjectPtr<class AS_SpawnNatureActor> SpawnPoint;
+
+	void SetSpawnPoint(class AS_SpawnNatureActor* Point)
+	{
+		SpawnPoint = Point;
+	}
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
 	TObjectPtr<class UStaticMeshComponent> Mesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hp)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float Health;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Physics)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shake")
 	float ShakeIntensity;
+	FVector OriginalLocation;
+	FTimerHandle DestroyTimerHandle;
 
+	void DestroyActor();
+
+	UPROPERTY(EditDefaultsOnly, Category = ItemData)
+	TSubclassOf<class AS_Pickup> PickupClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ItemData)
+	TObjectPtr<UDataTable> ItemDropTable;
+
+	void DropItem();
 };

@@ -11,7 +11,7 @@ US_EnemyStatComponent::US_EnemyStatComponent()
 void US_EnemyStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentHp = MaxHp;
+	SetHp(MaxHp);
 }
 
 float US_EnemyStatComponent::ApplyDamage(float InDamage)
@@ -30,7 +30,7 @@ float US_EnemyStatComponent::ApplyDamage(float InDamage)
 
 void US_EnemyStatComponent::SetHp(float NewHp)
 {
-	CurrentHp = FMath::Clamp(NewHp, 0.0f, MaxHp);
+	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, MaxHp);
 
 	OnAIHpChanged.Broadcast(CurrentHp);
 }

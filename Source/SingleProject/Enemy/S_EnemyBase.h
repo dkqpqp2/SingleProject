@@ -49,8 +49,8 @@ protected:
 protected:
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxHp = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Hp)
+	float MaxHp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CurrentHp;

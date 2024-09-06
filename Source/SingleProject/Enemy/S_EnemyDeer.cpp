@@ -5,6 +5,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/S_EnemyStatComponent.h"
 
 AS_EnemyDeer::AS_EnemyDeer()
 {
@@ -36,14 +37,13 @@ AS_EnemyDeer::AS_EnemyDeer()
 	}
 
 	CurrentEnemyType = EEnemyType::Deer;
-	MaxHp = 50.0f;
+	MaxHp = Stat->GetMaxHp();
 }
 
 void AS_EnemyDeer::BeginPlay()
 {
 	Super::BeginPlay();
 	SetMaxHp(MaxHp);
-	CurrentHp = MaxHp;
 }
 
 void AS_EnemyDeer::SetDead()

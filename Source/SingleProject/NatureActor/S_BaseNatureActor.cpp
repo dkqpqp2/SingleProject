@@ -2,6 +2,11 @@
 
 
 #include "S_BaseNatureActor.h"
+#include "NatureActor/Tree/S_TreeActor.h"
+#include "Data/ItemDataStructs.h"
+#include "World/S_Pickup.h"
+#include "Items/S_ItemBase.h"
+#include "NatureActor/S_SpawnNatureActor.h"
 
 // Sets default values
 AS_BaseNatureActor::AS_BaseNatureActor()
@@ -9,12 +14,9 @@ AS_BaseNatureActor::AS_BaseNatureActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetCollisionProfileName(TEXT("Tree"));
 	RootComponent = Mesh;
-
-
-	Health = 100.0f;  // 기본 체력
-	ShakeIntensity = 5.0f;  // 흔들림 강도
+	Health = 100.0f;
+	ShakeIntensity = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -41,15 +43,69 @@ float AS_BaseNatureActor::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	if (ActualDamage > 0.0f)
 	{
 		Health -= ActualDamage;
-		FVector Impulse = FMath::VRand() * ShakeIntensity;
-		Mesh->AddImpulse(Impulse, NAME_None, true);
-		if (Health <= 0.0f)
+		if (Health > 0.0f)
 		{
-			Mesh->AddImpulse(FVector(0, 0, -1) * 500.0f, NAME_None, true);
+			// 흔들림 시작
+			if (AS_TreeActor* TreeActor = Cast<AS_TreeActor>(this))
+			{
+				TreeActor->StartShaking(1.0f);  // 1초 동안 흔들림
+			}
+		}
+		else
+		{
+			// 체력이 0 이하로 떨어지면 쓰러짐 처리
+			if (AS_TreeActor* TreeActor = Cast<AS_TreeActor>(this))
+			{
+				TreeActor->Fall();
+				GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &AS_TreeActor::DestroyActor, 3.0f, false);
+			}
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health : %f"), Health));
 	return ActualDamage;
+}
+
+void AS_BaseNatureActor::DestroyActor()
+{
+	Destroy(); 
+	DropItem();
+	if (SpawnPoint)
+	{
+		SpawnPoint->ClearSpawnObject();
+	}
+}
+
+void AS_BaseNatureActor::DropItem()
+{
+	if (!ItemDropTable)
+	{
+		return;
+	}
+
+	TArray<FName> RowNames = ItemDropTable->GetRowNames();
+	if (RowNames.Num() == 0)
+	{
+		return;
+	}
+
+	FName SelectRowName = RowNames[FMath::RandRange(0, RowNames.Num() - 1)];
+
+	const FItemData* ItemData = ItemDropTable->FindRow<FItemData>(SelectRowName, "");
+	if (ItemData)
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 50);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		AS_Pickup* SpawnPickup = GetWorld()->SpawnActor<AS_Pickup>(PickupClass, SpawnLocation, SpawnRotation);
+		if (SpawnPickup)
+		{
+			SpawnPickup->SetItemDataTable(ItemDropTable);
+			SpawnPickup->SetInDesiredItemID(SelectRowName);
+			int32 Random = FMath::RandRange(1, 10);
+			SpawnPickup->InitializePickup(US_ItemBase::StaticClass(), Random);
+		}
+	}
+
 }
 
 

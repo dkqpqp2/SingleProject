@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Components/S_EnemyStatComponent.h"
 
 AS_EnemyWolf::AS_EnemyWolf()
 {
@@ -36,7 +37,7 @@ AS_EnemyWolf::AS_EnemyWolf()
 	}
 
 	CurrentEnemyType = EEnemyType::Wolf;
-	MaxHp = 150.0f;
+	MaxHp = Stat->GetMaxHp();
 }
 
 void AS_EnemyWolf::BeginPlay()
