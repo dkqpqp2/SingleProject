@@ -19,6 +19,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void StartShaking(float Duration);
 
 public:	
 	// Called every frame
@@ -38,7 +39,7 @@ public:
 	{
 		SpawnPoint = Point;
 	}
-
+	FTimerHandle DestroyTimerHandle;
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
 	TObjectPtr<class UStaticMeshComponent> Mesh;
@@ -49,15 +50,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shake")
 	float ShakeIntensity;
 	FVector OriginalLocation;
-	FTimerHandle DestroyTimerHandle;
-
-	void DestroyActor();
-
-	UPROPERTY(EditDefaultsOnly, Category = ItemData)
-	TSubclassOf<class AS_Pickup> PickupClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ItemData)
-	TObjectPtr<UDataTable> ItemDropTable;
-
-	void DropItem();
+	
 };

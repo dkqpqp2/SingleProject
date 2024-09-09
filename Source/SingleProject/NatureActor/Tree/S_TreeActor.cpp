@@ -2,6 +2,9 @@
 
 
 #include "S_TreeActor.h"
+#include "NatureActor/S_SpawnNatureActor.h"
+#include "World/S_Pickup.h"
+#include "Items/S_ItemBase.h"
 
 AS_TreeActor::AS_TreeActor()
 {
@@ -42,6 +45,17 @@ void AS_TreeActor::Tick(float DeltaTime)
 	}
 }
 
+void AS_TreeActor::DestroyActor()
+{
+	Destroy();
+	DropItem();
+	if (SpawnPoint)
+	{
+		SpawnPoint->ClearSpawnObject();
+	}
+	
+}
+
 void AS_TreeActor::UpdateShake(float DeltaTime)
 {
 	ShakeTimeElapsed += DeltaTime;
@@ -66,14 +80,53 @@ void AS_TreeActor::Fall()
 void AS_TreeActor::HandleFall()
 {
 	// 설정된 회전 값으로 천천히 기울어지게 하기
-	TargetRotation = FRotator(-120.0f, 0.0f, 0.0f);  // 나무가 쓰러질 방향
+	TargetRotation = FRotator(-90.0f, 0.0f, 0.0f);  // 나무가 쓰러질 방향
 	FRotator CurrentRotation = GetActorRotation();
 	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), FallSpeed);
 	SetActorRotation(NewRotation);
 }
 
+void AS_TreeActor::DestroyTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &AS_TreeActor::DestroyActor, 3.0f, false);
+}
+
+void AS_TreeActor::DropItem()
+{
+	if (!ItemDropTable)
+	{
+		return;
+	}
+
+	TArray<FName> RowNames = ItemDropTable->GetRowNames();
+	if (RowNames.Num() == 0)
+	{
+		return;
+	}
+
+	FName SelectRowName = RowNames[FMath::RandRange(0, RowNames.Num() - 1)];
+
+	const FItemData* ItemData = ItemDropTable->FindRow<FItemData>(SelectRowName, "");
+	if (ItemData)
+	{
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 50);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		AS_Pickup* SpawnPickup = GetWorld()->SpawnActor<AS_Pickup>(PickupClass, SpawnLocation, SpawnRotation);
+		if (SpawnPickup)
+		{
+			SpawnPickup->SetItemDataTable(ItemDropTable);
+			SpawnPickup->SetInDesiredItemID(SelectRowName);
+			int32 Random = FMath::RandRange(1, 10);
+			SpawnPickup->InitializePickup(US_ItemBase::StaticClass(), Random);
+		}
+	}
+
+}
+
 void AS_TreeActor::StartShaking(float Duration)
 {
+	Super::StartShaking(Duration);
 	if (bIsShaking) // 이미 흔들리고 있는 경우 중복 호출 방지
 	{
 		return;

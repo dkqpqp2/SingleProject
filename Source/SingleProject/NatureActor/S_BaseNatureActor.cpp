@@ -5,8 +5,9 @@
 #include "NatureActor/Tree/S_TreeActor.h"
 #include "Data/ItemDataStructs.h"
 #include "World/S_Pickup.h"
-#include "Items/S_ItemBase.h"
-#include "NatureActor/S_SpawnNatureActor.h"
+#include "NatureActor/Tree/S_TreeActor.h"
+#include "NatureActor/Rock/S_RockActor.h"
+
 
 // Sets default values
 AS_BaseNatureActor::AS_BaseNatureActor()
@@ -24,6 +25,10 @@ void AS_BaseNatureActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AS_BaseNatureActor::StartShaking(float Duration)
+{
 }
 
 // Called every frame
@@ -50,6 +55,10 @@ float AS_BaseNatureActor::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 			{
 				TreeActor->StartShaking(1.0f);  // 1초 동안 흔들림
 			}
+			else if (AS_RockActor* RockActor = Cast<AS_RockActor>(this))
+			{
+				RockActor->StartShaking(0.5f);
+			}
 		}
 		else
 		{
@@ -57,55 +66,16 @@ float AS_BaseNatureActor::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 			if (AS_TreeActor* TreeActor = Cast<AS_TreeActor>(this))
 			{
 				TreeActor->Fall();
-				GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &AS_TreeActor::DestroyActor, 3.0f, false);
+				TreeActor->DestroyTimer();
+			}
+			else if (AS_RockActor* RockActor = Cast<AS_RockActor>(this))
+			{
+				RockActor->DestroyTimer();
 			}
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health : %f"), Health));
 	return ActualDamage;
-}
-
-void AS_BaseNatureActor::DestroyActor()
-{
-	Destroy(); 
-	DropItem();
-	if (SpawnPoint)
-	{
-		SpawnPoint->ClearSpawnObject();
-	}
-}
-
-void AS_BaseNatureActor::DropItem()
-{
-	if (!ItemDropTable)
-	{
-		return;
-	}
-
-	TArray<FName> RowNames = ItemDropTable->GetRowNames();
-	if (RowNames.Num() == 0)
-	{
-		return;
-	}
-
-	FName SelectRowName = RowNames[FMath::RandRange(0, RowNames.Num() - 1)];
-
-	const FItemData* ItemData = ItemDropTable->FindRow<FItemData>(SelectRowName, "");
-	if (ItemData)
-	{
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 50);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-
-		AS_Pickup* SpawnPickup = GetWorld()->SpawnActor<AS_Pickup>(PickupClass, SpawnLocation, SpawnRotation);
-		if (SpawnPickup)
-		{
-			SpawnPickup->SetItemDataTable(ItemDropTable);
-			SpawnPickup->SetInDesiredItemID(SelectRowName);
-			int32 Random = FMath::RandRange(1, 10);
-			SpawnPickup->InitializePickup(US_ItemBase::StaticClass(), Random);
-		}
-	}
-
 }
 
 

@@ -22,8 +22,8 @@ protected:
 	TArray<TSubclassOf<class AS_BaseNatureActor>> NatureActorClass;
 
 	TObjectPtr<class AS_BaseNatureActor> SpawnNature;
-
-	UPROPERTY(EditAnywhere)
+	float RandomTime = FMath::RandRange(10.0f, 50.0f);
+	UPROPERTY(VisibleAnywhere)
 	float SpawnTime;
 
 	float AccTime;

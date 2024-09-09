@@ -13,5 +13,38 @@ UCLASS()
 class SINGLEPROJECT_API AS_RockActor : public AS_BaseNatureActor
 {
 	GENERATED_BODY()
-	
+
+public:
+	AS_RockActor();
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime)override;
+
+	FVector OriginalLocation;
+	bool bHasFallen;
+	bool bIsShaking;
+	float ShakeDuration;  // 흔들림 지속 시간
+	float ShakeTimeElapsed;  // 경과한 흔들림 시간
+
+
+	UPROPERTY(EditDefaultsOnly, Category = ItemData)
+	TSubclassOf<class AS_Pickup> PickupClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ItemData)
+	TObjectPtr<UDataTable> ItemDropTable;
+
+public:
+
+	// 흔들림 시작 함수
+	virtual void StartShaking(float Duration) override;
+	// 흔들림 정지 함수
+	void StopShaking();
+	void UpdateShake(float DeltaTime);
+
+	void DestroyTimer();
+
+	UFUNCTION()
+	void DestroyActor();
+
+	void DropItem();
 };

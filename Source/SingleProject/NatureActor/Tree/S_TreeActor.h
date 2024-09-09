@@ -28,13 +28,27 @@ protected:
 	FRotator TargetRotation;
 	float FallSpeed;  // 쓰러지는 속도 조절
 
+	UPROPERTY(EditDefaultsOnly, Category = ItemData)
+	TSubclassOf<class AS_Pickup> PickupClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ItemData)
+	TObjectPtr<UDataTable> ItemDropTable;
+
 
 public:
+
 	// 흔들림 시작 함수
-	void StartShaking(float Duration);
+	virtual void StartShaking(float Duration) override;
 	// 흔들림 정지 함수
 	void StopShaking();
 	void UpdateShake(float DeltaTime);
 	void Fall();
 	void HandleFall();
+
+	void DestroyTimer();
+
+	UFUNCTION()
+	void DestroyActor();
+
+	void DropItem();
 };

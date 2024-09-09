@@ -15,7 +15,8 @@ AS_SpawnNatureActor::AS_SpawnNatureActor()
 
 	SpawnNature = nullptr;
 	AccTime = 0.0f;
-	SpawnTime = 0.0f;
+
+	SpawnTime = RandomTime;
 
 }
 
@@ -69,5 +70,6 @@ void AS_SpawnNatureActor::ClearSpawnObject()
 {
 	SpawnNature = nullptr;
 	AccTime = 0.f;
+	SpawnTime = RandomTime;
 }
 
