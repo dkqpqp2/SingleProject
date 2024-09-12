@@ -5,9 +5,18 @@
 #include "UserInterface/S_MainMenu.h"
 #include "UserInterface/Interaction/S_InteractionWidget.h"
 #include "UserInterface/Equipment/S_EquipmentPanel.h"
+#include "UserInterface/Craft/S_CraftingWidget.h"
 
 AS_HUD::AS_HUD()
 {
+	if (CraftingWidgetClass)
+	{
+		CraftingWidget = CreateWidget<US_CraftingWidget>(GetOwningPlayerController(), CraftingWidgetClass);
+		if (CraftingWidget)
+		{
+			CraftingWidget->AddToViewport();
+		}
+	}
 }
 
 void AS_HUD::BeginPlay()
@@ -40,6 +49,13 @@ void AS_HUD::BeginPlay()
 		EquipmentWidget = CreateWidget<US_EquipmentPanel>(GetWorld(), EquipmentWidgetClass);
 		EquipmentWidget->AddToViewport();
 		EquipmentWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (CraftingWidgetClass)
+	{
+		CraftingWidget = CreateWidget<US_CraftingWidget>(GetWorld(), CraftingWidgetClass);
+		CraftingWidget->AddToViewport();
+		CraftingWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
 }
@@ -126,6 +142,11 @@ void AS_HUD::UpdateInteractionWidget(const FInteractableData* InteractableData) 
 		}
 		InteractionWidget->UpdateWidget(InteractableData);
 	}
+}
+
+US_CraftingWidget* AS_HUD::GetCraftingWidget() const
+{
+	return CraftingWidget;
 }
 
 

@@ -95,6 +95,18 @@ struct FItemAssetData
 
 };
 
+USTRUCT(BlueprintType)
+struct FIngredientData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ingredient")
+	FName IngredientID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ingredient")
+	int32 AmountRequired;
+};
+
 USTRUCT()
 struct FItemData : public FTableRowBase
 {
@@ -120,4 +132,7 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FItemAssetData ItemAssetData;
+
+	UPROPERTY(EditAnywhere, Category = "Item Data")
+	TArray<FIngredientData> Ingredients;
 };

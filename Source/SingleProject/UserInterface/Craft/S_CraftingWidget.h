@@ -6,6 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "S_CraftingWidget.generated.h"
 
+struct FItemData;
+class UItemButtonWidget;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeText, const FItemData&);
 /**
  * 
  */
@@ -14,22 +18,38 @@ class SINGLEPROJECT_API US_CraftingWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-    // ScrollBox와 Text 같은 위젯에 대한 참조
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<class UScrollBox> ItemListScrollBox;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<class UTextBlock> ItemDescriptionText;
+    TObjectPtr<class UTextBlock> ItemName;
 
     UPROPERTY(meta = (BindWidget))
-    TObjectPtr<class UButton> CraftButton;
+    TObjectPtr<class UTextBlock> ItemDescriptionText;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CraftItemData)
+    FOnChangeText OnChangeTextDelegate;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<TObjectPtr<UDataTable>> CraftItemList;
+
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<class US_CraftItemButtonWidget> ButtonListClass;
 
     void PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTables);
 
-    void OnItemClicked(FItemData SelectedItem);
+    UFUNCTION()
+    void OnItemClicked(FName ItemID);
 
-	
+protected:
+    virtual void NativeConstruct() override;
+    virtual void NativeOnInitialized() override;
+
+private:
+    UFUNCTION()
+    void UpdateItemDescription(const FItemData& ItemData);
+
+    UDataTable* FindItemDataTable(FName ItemID);
+
+    TMap<FName, FItemData> CachedItemDataMap;
+
 };

@@ -2,6 +2,12 @@
 
 
 #include "S_PlayerController.h"
+#include "SingleProject/UserInterface/S_HUD.h"
+
+AS_PlayerController::AS_PlayerController()
+{
+	HUD = CreateDefaultSubobject<AS_HUD>(TEXT("HUD"));
+}
 
 void AS_PlayerController::BeginPlay()
 {

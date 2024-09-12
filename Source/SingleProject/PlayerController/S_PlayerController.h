@@ -14,7 +14,11 @@ class SINGLEPROJECT_API AS_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	AS_PlayerController();
+
+	TObjectPtr<class AS_HUD> HUD;
 protected:
 	virtual void BeginPlay()override;
-	
+
 };

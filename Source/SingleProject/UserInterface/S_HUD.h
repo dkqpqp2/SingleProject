@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	TSubclassOf<US_EquipmentPanel> EquipmentWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<US_CraftingWidget> CraftingWidgetClass;
+
 	bool bIsMenuVisible;
 
 	AS_HUD();
@@ -46,8 +49,10 @@ public:
 
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
+
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
+	US_CraftingWidget* GetCraftingWidget() const;
 protected:
 	UPROPERTY()
 	TObjectPtr<US_MainMenu> MainMenuWidget;
@@ -60,6 +65,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class US_EquipmentPanel> EquipmentWidget;
+
+	UPROPERTY()
+	TObjectPtr<class US_CraftingWidget> CraftingWidget;
 
 	virtual void BeginPlay() override;
 };
