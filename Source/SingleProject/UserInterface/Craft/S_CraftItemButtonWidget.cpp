@@ -25,6 +25,8 @@ void US_CraftItemButtonWidget::SetupButton(const FName& NewItemID, const FText& 
 	if (ItemNameText)
 	{
 		ItemNameText->SetText(ItemName);
+		//FString LogMessage = FString::Printf(TEXT("Name : %s, ID : %s"), *ItemName.ToString(), *NewItemID.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, LogMessage);
 	}
 }
 
@@ -42,9 +44,9 @@ void US_CraftItemButtonWidget::OnItemButtonClicked()
 			if (CraftingWidget)
 			{
 				CraftingWidget->OnItemClicked(ItemID);
+				FString LogMessage = FString::Printf(TEXT("ItemID : %s"), *ItemID.ToString());
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, LogMessage);
 			}
 		}
-		// HUD 또는 플레이어 컨트롤러에서 Crafting Widget을 찾습니다
-		
 	}
 }

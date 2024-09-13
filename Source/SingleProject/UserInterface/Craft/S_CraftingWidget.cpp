@@ -4,6 +4,8 @@
 #include "S_CraftingWidget.h"
 #include "Data/ItemDataStructs.h"
 #include "SingleProject/UserInterface/Craft/S_CraftItemButtonWidget.h"
+#include "Items/S_ItemBase.h"
+#include "Components/S_InventoryComponent.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
@@ -19,10 +21,7 @@ void US_CraftingWidget::NativeConstruct()
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ItemDescriptionText 또는 ItemName이 null입니다."));
     }
-    else
-    {
-        OnChangeTextDelegate.AddUObject(this, &US_CraftingWidget::UpdateItemDescription);
-    }
+
 }
 
 void US_CraftingWidget::NativeOnInitialized()
@@ -53,6 +52,13 @@ void US_CraftingWidget::PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTabl
             {
                 //UHorizontalBox* HorizontalBox = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
                 US_CraftItemButtonWidget* ItemButton = WidgetTree->ConstructWidget<US_CraftItemButtonWidget>(ButtonListClass);
+                if (ItemButton)
+                {
+                    ItemButton->SetupButton(ItemRow->ID, ItemRow->ItemTextData.Name);
+                    ItemListScrollBox->AddChild(ItemButton);
+                    
+                    CachedItemDataMap.Add(ItemRow->ID, *ItemRow);
+                }
                 //UTextBlock* ButtonText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
                 //UImage* ItemImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
 
@@ -62,14 +68,10 @@ void US_CraftingWidget::PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTabl
                 //HorizontalBox->AddChild(ItemImage);
                 //ButtonText->SetText(FText::FromName(ItemRow->ID));
                 //HorizontalBox->AddChild(ButtonText);
-
-                ItemButton->SetupButton(ItemRow->ID, ItemRow->ItemTextData.Name);
-                ItemListScrollBox->AddChild(ItemButton);
-
-                CachedItemDataMap.Add(ItemRow->ID, *ItemRow);
             }
         }
     }
+    ItemDescriptionText->SetText(FText::FromString(TEXT("조합하고싶은 아이템을 클릭해주세요")));
 }
 
 void US_CraftingWidget::OnItemClicked(FName ItemID)
@@ -78,7 +80,17 @@ void US_CraftingWidget::OnItemClicked(FName ItemID)
     {
         const FItemData& ItemData = CachedItemDataMap[ItemID];
         UpdateItemDescription(ItemData);
-        OnChangeTextDelegate.Broadcast(ItemData);
+        FString LogMessage;
+        LogMessage += FString::Printf(TEXT("ItemTextData: %s\n"), *ItemData.ItemTextData.Name.ToString());
+
+        for (const FIngredientData& Ingredient : ItemData.Ingredients)
+        {
+            LogMessage += FString::Printf(TEXT("IngredientID: %s, AmountRequired: %d\n"),
+                *Ingredient.IngredientID.ToString(), Ingredient.AmountRequired);
+        }
+
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, LogMessage);
+        OnChangeTextDelegate.Broadcast();
     }
 }
 
@@ -87,23 +99,27 @@ void US_CraftingWidget::UpdateItemDescription(const FItemData& ItemData)
     if (ItemDescriptionText && ItemName)
     {
         FString DescriptionText;
-        DescriptionText += FString::Printf(TEXT("Item: %s\n"), *ItemData.ItemTextData.Name.ToString());
 
         // 재료 정보를 표시
-        for (const FIngredientData& Ingredient : ItemData.Ingredients)
+        if (InventoryReference)
         {
-            DescriptionText += FString::Printf(TEXT("A: %s, Amount: %d\n"), *Ingredient.IngredientID.ToString(), Ingredient.AmountRequired);
-        }
+            for (const FIngredientData& Ingredient : ItemData.Ingredients)
+            {
+                US_ItemBase* InventoryItem = InventoryReference->FindItemByID(Ingredient.IngredientID);
+                int32 ItemQuantity = InventoryItem ? InventoryItem->Quantity : 0;
 
+                DescriptionText = FString::Printf(TEXT("%s: %d / %d\n"),
+                    *Ingredient.IngredientID.ToString(), ItemQuantity, Ingredient.AmountRequired);
+            }
+        }
         // 텍스트 업데이트
         ItemName->SetText(ItemData.ItemTextData.Name);
         ItemDescriptionText->SetText(FText::FromString(DescriptionText));
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Description updated successfully"));
+        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Description updated successfully"));
+        OnChangeTextDelegate.Broadcast();
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ItemDescriptionText 또는 ItemName이 null입니다."));
+        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("ItemDescriptionText 또는 ItemName이 null입니다."));
     }
-
-   
 }

@@ -38,9 +38,6 @@ public:
 	TSubclassOf<US_InventoryItemSlot> InventorySlotClass;
 
 protected:
-	UPROPERTY()
-	US_InventoryComponent* InventoryComponent;
-
 	void SetInfoText() const;
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;

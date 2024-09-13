@@ -120,6 +120,8 @@ public:
 	UPROPERTY()
 	TObjectPtr<class US_EquipmentSlot> EquipmentSlot;
 
+	UFUNCTION(Category = "Inventory")
+	US_ItemBase* FindItemByID(FName ItemID) const;
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")

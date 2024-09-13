@@ -10,6 +10,22 @@ US_InventoryComponent::US_InventoryComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+US_ItemBase* US_InventoryComponent::FindItemByID(FName ItemID) const
+{
+	if (!InventoryContents.IsValidIndex(0))
+	{
+		return nullptr;
+	}
+	for (US_ItemBase* Item : InventoryContents)
+	{
+		if (Item && Item->ID == ItemID)
+		{
+			return Item;
+		}
+	}
+	return nullptr;
+}
+
 void US_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();

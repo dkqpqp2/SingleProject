@@ -9,7 +9,7 @@
 struct FItemData;
 class UItemButtonWidget;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeText, const FItemData&);
+DECLARE_MULTICAST_DELEGATE(FOnChangeText);
 /**
  * 
  */
@@ -26,6 +26,9 @@ public:
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<class UTextBlock> ItemDescriptionText;
+
+    UPROPERTY()
+    TObjectPtr<class US_InventoryComponent> InventoryReference;
 
     FOnChangeText OnChangeTextDelegate;
 
@@ -45,7 +48,6 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    UFUNCTION()
     void UpdateItemDescription(const FItemData& ItemData);
 
     UDataTable* FindItemDataTable(FName ItemID);
