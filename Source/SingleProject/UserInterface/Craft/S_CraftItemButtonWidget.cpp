@@ -16,6 +16,10 @@ void US_CraftItemButtonWidget::NativeConstruct()
 	{
 		ItemButton->OnClicked.AddDynamic(this, &US_CraftItemButtonWidget::OnItemButtonClicked);
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Emerald,TEXT("ItemButton is null"));
+	}
 
 }
 
@@ -25,8 +29,6 @@ void US_CraftItemButtonWidget::SetupButton(const FName& NewItemID, const FText& 
 	if (ItemNameText)
 	{
 		ItemNameText->SetText(ItemName);
-		//FString LogMessage = FString::Printf(TEXT("Name : %s, ID : %s"), *ItemName.ToString(), *NewItemID.ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, LogMessage);
 	}
 }
 
@@ -34,19 +36,5 @@ void US_CraftItemButtonWidget::SetupButton(const FName& NewItemID, const FText& 
 
 void US_CraftItemButtonWidget::OnItemButtonClicked()
 {
-	AS_PlayerController* PlayerController = Cast<AS_PlayerController>(GetOwningPlayer());
-	if (PlayerController)
-	{
-		AS_HUD* S_HUD = Cast<AS_HUD>(PlayerController->GetHUD());
-		if (S_HUD)
-		{
-			US_CraftingWidget* CraftingWidget = S_HUD->GetCraftingWidget();
-			if (CraftingWidget)
-			{
-				CraftingWidget->OnItemClicked(ItemID);
-				FString LogMessage = FString::Printf(TEXT("ItemID : %s"), *ItemID.ToString());
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, LogMessage);
-			}
-		}
-	}
+	OnCraftItemButtonClicked.ExecuteIfBound(ItemID);
 }

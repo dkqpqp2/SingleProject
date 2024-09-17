@@ -9,6 +9,8 @@
 /**
  * 
  */
+DECLARE_DELEGATE_OneParam(FOnCraftItemClicked, FName);
+
 UCLASS()
 class SINGLEPROJECT_API US_CraftItemButtonWidget : public UUserWidget
 {
@@ -26,6 +28,7 @@ public:
 
 	void SetupButton(const FName& NewItemID, const FText& ItemName);
 
+	FOnCraftItemClicked OnCraftItemButtonClicked;
 protected:
 	virtual void NativeConstruct() override;
 

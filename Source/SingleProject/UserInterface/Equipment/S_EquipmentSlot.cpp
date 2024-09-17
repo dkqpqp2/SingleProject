@@ -113,6 +113,10 @@ void US_EquipmentSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 void US_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+	if (EquippedItem == nullptr)
+	{
+		return;
+	}
 	if (DragItemVisualClass)
 	{
 		const TObjectPtr<US_DragItemVisual> DragVisual = CreateWidget<US_DragItemVisual>(this, DragItemVisualClass);

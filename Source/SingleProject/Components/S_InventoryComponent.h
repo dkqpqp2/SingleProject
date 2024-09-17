@@ -122,6 +122,8 @@ public:
 
 	UFUNCTION(Category = "Inventory")
 	US_ItemBase* FindItemByID(FName ItemID) const;
+
+	TArray<US_ItemBase*> GetAllItems() const;
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
@@ -144,4 +146,8 @@ protected:
 	int32 CalculateNumberForFullStack(US_ItemBase* StackableItem, int32 InitialRequestedAddAmount);
 
 	void AddNewItem(US_ItemBase* Item, const int32 AmountToAdd);
+
+private:
+	UPROPERTY()
+	TArray<US_ItemBase*> InventoryItems;
 };

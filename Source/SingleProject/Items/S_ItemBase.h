@@ -10,7 +10,6 @@ class AS_CharacterPlayer;
 class US_InventoryComponent;
 class US_EquipmentSlot;
 
-
 UENUM()
 enum class ESlotName : uint8
 {
@@ -62,6 +61,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FItemAssetData ItemAssetData;
 
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	TArray<FIngredientData> Ingredients;
+
 	bool bIsCopy;
 	bool bIsPickup;
 
@@ -90,6 +92,9 @@ public:
 	virtual void Use(AS_CharacterPlayer* Character, US_ItemBase* UseItem);
 
 	void EquipToSocket(AS_CharacterPlayer* Character, const FName& SocketName);
+
+	TObjectPtr<US_ItemBase> CreateCraftItem(AS_CharacterPlayer* Character,const FItemData& InItemData);
+	void SetCraftItem(AS_CharacterPlayer* Character, const FItemData& InItemData);
 
 protected:
 	bool operator==(const FName& OtherID) const

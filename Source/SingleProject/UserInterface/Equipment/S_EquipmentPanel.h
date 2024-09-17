@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "S_EquipmentSlot.h"
 #include "S_EquipmentPanel.generated.h"
 
-class US_EquipmentSlot;
 /**
  * 
  */
@@ -16,19 +16,19 @@ class SINGLEPROJECT_API US_EquipmentPanel : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<US_EquipmentSlot> WeaponSlot;
+	TObjectPtr<class US_EquipmentSlot> WeaponSlot;
 
 	UPROPERTY(meta = (BindWidget))        
-	TObjectPtr<US_EquipmentSlot> HelmetSlot;
+	TObjectPtr<class US_EquipmentSlot> HelmetSlot;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<US_EquipmentSlot> ArmorSlot;
+	TObjectPtr<class US_EquipmentSlot> ArmorSlot;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<US_EquipmentSlot> ShieldSlot;
+	TObjectPtr<class US_EquipmentSlot> ShieldSlot;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<US_EquipmentSlot> BootsSlot;
+	TObjectPtr<class US_EquipmentSlot> BootsSlot;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> DamageInfo;
@@ -50,7 +50,7 @@ public:
 	UFUNCTION()
 	void RefreshEquipmentSlot();
 
-	TMap<ESlotName, TObjectPtr<US_EquipmentSlot>> SlotWidgetMap;
+	TMap<ESlotName, TObjectPtr<class US_EquipmentSlot>> SlotWidgetMap;
 
 
 protected:

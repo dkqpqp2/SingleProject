@@ -19,11 +19,11 @@ void US_EquipmentPanel::NativeConstruct()
     InitializeSlots();
 
     SlotWidgetMap = {
-         {ESlotName::Weapon, WeaponSlot},
-         {ESlotName::Helmet, HelmetSlot},
-         {ESlotName::Armor, ArmorSlot},
-         {ESlotName::Shield, ShieldSlot},
-         {ESlotName::Boots, BootsSlot}
+        {ESlotName::Weapon, WeaponSlot},
+        {ESlotName::Helmet, HelmetSlot},
+        {ESlotName::Armor, ArmorSlot},
+        {ESlotName::Shield, ShieldSlot},
+        {ESlotName::Boots, BootsSlot}
     };
 
     // 각 슬롯에 SlotName을 설정해줌
@@ -47,6 +47,7 @@ void US_EquipmentPanel::NativeOnInitialized()
             SetInfoText();
         }
     }
+
 }
 
 bool US_EquipmentPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)

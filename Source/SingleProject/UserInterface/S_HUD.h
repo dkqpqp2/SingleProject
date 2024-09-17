@@ -10,6 +10,7 @@
 class US_MainMenu;
 class US_InteractionWidget;
 class US_EquipmentPanel;
+class US_CraftingWidget;
 struct FInteractableData;
 /**
  * 

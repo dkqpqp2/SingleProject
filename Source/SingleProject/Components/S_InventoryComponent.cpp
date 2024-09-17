@@ -26,6 +26,11 @@ US_ItemBase* US_InventoryComponent::FindItemByID(FName ItemID) const
 	return nullptr;
 }
 
+TArray<US_ItemBase*> US_InventoryComponent::GetAllItems() const
+{
+	return InventoryItems;
+}
+
 void US_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();

@@ -33,6 +33,7 @@ void US_EquipmentComponent::EquipItem(const ESlotName SlotName, const FName& Soc
 		return;
 	}
 
+
 	if (IsSlotOccupied(SlotName))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EquipItem: Slot %s is already occupied."), *SlotNameString);

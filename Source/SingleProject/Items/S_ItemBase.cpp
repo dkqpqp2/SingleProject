@@ -23,15 +23,17 @@ void US_ItemBase::ResetItemFlags()
 
 TObjectPtr<US_ItemBase> US_ItemBase::CreateItemCopy() const
 {
-	US_ItemBase* ItemCopy = NewObject<US_ItemBase>(StaticClass());
+	US_ItemBase* ItemCopy = NewObject<US_ItemBase>();
 
 	ItemCopy->ID = ID;
 	ItemCopy->Quantity = Quantity;
 	ItemCopy->ItemQuality = ItemQuality;
 	ItemCopy->ItemType = ItemType;
 	ItemCopy->ItemNumericData = ItemNumericData;
+	ItemCopy->ItemTextData = ItemTextData;
 	ItemCopy->ItemStatistics = ItemStatistics;
 	ItemCopy->ItemAssetData = ItemAssetData;
+	ItemCopy->Ingredients = Ingredients;
 
 	ItemCopy->OwningInventory = OwningInventory;
 	ItemCopy->OwningEquipment = OwningEquipment;
@@ -50,8 +52,10 @@ TObjectPtr<US_ItemBase> US_ItemBase::CreateItem(const AS_CharacterPlayer* Player
 	ItemCopy->ItemQuality = ItemQuality;
 	ItemCopy->ItemType = ItemType;
 	ItemCopy->ItemNumericData = ItemNumericData;
+	ItemCopy->ItemTextData = ItemTextData;
 	ItemCopy->ItemStatistics = ItemStatistics;
 	ItemCopy->ItemAssetData = ItemAssetData;
+	ItemCopy->Ingredients = Ingredients;
 
 	//플레이어가 가지는 인벤토리 및 장비 컴포넌트 세팅
 	//ItemCopy->OwningPlayer = Player; 이거로 하면 나중에 다른 컴포넌트 찾아서 사용도 가능
@@ -151,4 +155,40 @@ void US_ItemBase::EquipToSocket(AS_CharacterPlayer* Character, const FName& Sock
 		ItemMesh->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 		ItemMesh->RegisterComponent();
 	}
+}
+
+TObjectPtr<US_ItemBase> US_ItemBase::CreateCraftItem(AS_CharacterPlayer* Character, const FItemData& InItemData)
+{
+	OwnerCharacter = Character;
+	ID = InItemData.ID;
+	ItemQuality = InItemData.ItemQuality;
+	ItemType = InItemData.ItemType;
+	ItemNumericData = InItemData.ItemNumericData;
+	ItemTextData = InItemData.ItemTextData;
+	ItemStatistics = InItemData.ItemStaistics;
+	ItemAssetData = InItemData.ItemAssetData;
+	Ingredients = InItemData.Ingredients;
+
+	OwningInventory = OwnerCharacter->FindComponentByClass<US_InventoryComponent>();
+	OwningEquipment = OwnerCharacter->FindComponentByClass<US_EquipmentComponent>();
+
+	bIsCopy = true;
+
+	return NewObject<US_ItemBase>();
+}
+
+void US_ItemBase::SetCraftItem(AS_CharacterPlayer* Character, const FItemData& InItemData)
+{
+	OwnerCharacter = Character;
+	ID = InItemData.ID;
+	ItemQuality = InItemData.ItemQuality;
+	ItemType = InItemData.ItemType;
+	ItemNumericData = InItemData.ItemNumericData;
+	ItemTextData = InItemData.ItemTextData;
+	ItemStatistics = InItemData.ItemStaistics;
+	ItemAssetData = InItemData.ItemAssetData;
+	Ingredients = InItemData.Ingredients;
+
+	OwningInventory = OwnerCharacter->FindComponentByClass<US_InventoryComponent>();
+	OwningEquipment = OwnerCharacter->FindComponentByClass<US_EquipmentComponent>();
 }
