@@ -103,7 +103,7 @@ void AS_RockActor::DropItem()
 	const FItemData* ItemData = ItemDropTable->FindRow<FItemData>(SelectRowName, "");
 	if (ItemData)
 	{
-		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 50);
+		FVector SpawnLocation = GetActorLocation() + FVector(0, 0, 150);
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 
 		AS_Pickup* SpawnPickup = GetWorld()->SpawnActor<AS_Pickup>(PickupClass, SpawnLocation, SpawnRotation);

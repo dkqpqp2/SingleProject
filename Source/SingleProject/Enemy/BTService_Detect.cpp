@@ -69,7 +69,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 					if (DotProduct > 0.5f)
 					{
 						OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-						DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
+						//DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
 						return;
 					}
 				}
@@ -98,10 +98,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				if (Pawn && Pawn->GetController()->IsPlayerController())
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+					//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
 
-					DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-					DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Blue, false, 0.27f);
+					//DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					//DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Blue, false, 0.27f);
 					return;
 				}
 			}
@@ -109,6 +109,6 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 	Enemy->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }

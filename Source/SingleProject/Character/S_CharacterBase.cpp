@@ -40,7 +40,7 @@ AS_CharacterBase::AS_CharacterBase()
         GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
     }
 
-    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Character/Blueprints/ABP_CharacterPlayer.ABP_CharacterPlayer_C"));
+    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Character/AddAnimation/ABP_CharacterPlayer.ABP_CharacterPlayer_C"));
     if (AnimInstanceClassRef.Class)
     {
         GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);

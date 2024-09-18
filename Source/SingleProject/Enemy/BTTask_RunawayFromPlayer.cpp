@@ -91,7 +91,7 @@ bool UBTTask_RunawayFromPlayer::DetectAndSetTarget(UBehaviorTreeComponent& Owner
 				}
 
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-				DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
+				//DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return true;
 			}
 		}
@@ -128,8 +128,9 @@ void UBTTask_RunawayFromPlayer::RunAwayFromPlayer(UBehaviorTreeComponent& OwnerC
 	APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AS_AIController::TargetKey));
 	if (Target)
 	{
+		float Random = FMath::RandRange(1000.0f, 2000.0f);
 		FVector DirectionAwayFromPlayer = (Center - Target->GetActorLocation()).GetSafeNormal();
-		FVector RunawayLocation = Center + DirectionAwayFromPlayer * 1000.0f;  // 500 단위만큼 멀어지는 위치로 설정
+		FVector RunawayLocation = Center + DirectionAwayFromPlayer * Random;
 
 		// 블랙보드에 도망 위치 설정
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AS_AIController::RunawayLocationKey, RunawayLocation);

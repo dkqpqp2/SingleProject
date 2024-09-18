@@ -42,7 +42,7 @@ float AS_BaseNatureActor::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Damage : %f"), ActualDamage));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Damage : %f"), ActualDamage));
 	
 
 	if (ActualDamage > 0.0f)
@@ -74,7 +74,7 @@ float AS_BaseNatureActor::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 			}
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health : %f"), Health));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health : %f"), Health));
 	return ActualDamage;
 }
 
