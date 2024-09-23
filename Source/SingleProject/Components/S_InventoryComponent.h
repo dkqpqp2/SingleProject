@@ -28,19 +28,15 @@ struct FItemAddResult
 		OperationResult(EItemAddResult::IAR_NoItemAdded),
 		ResultMessage(FText::GetEmpty()) 
 	{};
-
 	// 인벤토리에 추가된 항목의 실제 양
 	UPROPERTY(BlueprintReadOnly, Category = "Item Add Result")
 	int32 ActualAmountAdded;
-
 	// 항목 추가 작업의 종료 상태를 나타내는 열거형
 	UPROPERTY(BlueprintReadOnly, Category = "Item Add Result")
 	EItemAddResult OperationResult;
-
 	// 결과와 함께 전달할 수 있는 안내 메시지
 	UPROPERTY(BlueprintReadOnly, Category = "Item Add Result")
 	FText ResultMessage;
-
 	static FItemAddResult AddedNone(const FText& ErrorText)
 	{
 		FItemAddResult AddedNoneResult;

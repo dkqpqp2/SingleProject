@@ -104,6 +104,9 @@ struct FIngredientData
 	FName IngredientID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ingredient")
+	FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ingredient")
 	int32 AmountRequired;
 };
 

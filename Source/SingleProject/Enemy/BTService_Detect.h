@@ -21,5 +21,6 @@ public:
 
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-	
+	void DetectPlayersInRange(UBehaviorTreeComponent& OwnerComp, APawn* ControllingPawn, float DetectRadius, bool bCheckDirection);
+
 };

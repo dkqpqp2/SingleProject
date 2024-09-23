@@ -45,23 +45,40 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	float DetectRadius = AIPawn->GetAIDetectRange();
 	if (Enemy->CurrentEnemyType == EEnemyType::Deer)
 	{
-		TArray<FOverlapResult> OverlapResults;
-		FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
-		bool bResult = World->OverlapMultiByChannel(
-			OverlapResults,
-			Center,
-			FQuat::Identity,
-			ECollisionChannel::ECC_GameTraceChannel1,
-			FCollisionShape::MakeSphere(DetectRadius),
-			CollisionQueryParam
-		);
+		DetectPlayersInRange(OwnerComp, ControllingPawn, DetectRadius, true);
+	}
+	else
+	{
+		DetectPlayersInRange(OwnerComp, ControllingPawn, DetectRadius, false);
+	}
+	
+	Enemy->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+}
 
-		if (bResult)
+void UBTService_Detect::DetectPlayersInRange(UBehaviorTreeComponent& OwnerComp, APawn* ControllingPawn, float DetectRadius, bool bCheckDirection)
+{
+	FVector Center = ControllingPawn->GetActorLocation();
+	FVector ForwardVector = ControllingPawn->GetActorForwardVector();
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
+	bool bResult = ControllingPawn->GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(DetectRadius),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
-			for (auto const& OverlapResult : OverlapResults)
+			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
+			if (Pawn && Pawn->GetController()->IsPlayerController())
 			{
-				APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-				if (Pawn && Pawn->GetController()->IsPlayerController())
+				if (bCheckDirection)
 				{
 					FVector DirectionToPlayer = (Pawn->GetActorLocation() - Center).GetSafeNormal();
 					float DotProduct = FVector::DotProduct(ForwardVector, DirectionToPlayer);
@@ -69,39 +86,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 					if (DotProduct > 0.5f)
 					{
 						OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-						//DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
 						return;
 					}
 				}
-
-			}
-		}
-	}
-	else
-	{
-		TArray<FOverlapResult> OverlapResults;
-		FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
-		bool bResult = World->OverlapMultiByChannel(
-			OverlapResults,
-			Center,
-			FQuat::Identity,
-			ECollisionChannel::ECC_GameTraceChannel1,
-			FCollisionShape::MakeSphere(DetectRadius),
-			CollisionQueryParam
-		);
-
-		if (bResult)
-		{
-			for (auto const& OverlapResult : OverlapResults)
-			{
-				APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-				if (Pawn && Pawn->GetController()->IsPlayerController())
+				else
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-					//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-
-					//DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-					//DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Blue, false, 0.27f);
 					return;
 				}
 			}
@@ -109,6 +99,4 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, nullptr);
-	//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
-	Enemy->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }

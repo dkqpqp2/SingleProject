@@ -148,34 +148,22 @@ int32 US_InventoryComponent::HandleStackableItems(US_ItemBase* ItemIn, int32 Req
 		return 0;
 	}
 	int32 AmountToDistribute = RequestedAddAmount;
-
 	// (인벤토리에 입력된 아이템이 이미 존재하고, 가득 찬 스택이 아닌지 확인)
 	US_ItemBase* ExistingItemStack = FindNextPartialStack(ItemIn);
-
 	// (기존 스택에 아이템 스택을 분배)
 	while (ExistingItemStack)
 	{
 		// (다음 가득 찬 스택을 만들기 위해 필요한 아이템 수량을 계산)
 		const int32 AmountToMakeFullStack = CalculateNumberForFullStack(ExistingItemStack, AmountToDistribute);
-
 		// (무게 용량을 기준으로 실제로 들 수 있는 수량을 계산)
 		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ExistingItemStack, AmountToMakeFullStack);
-
 		// (남은 아이템 수량이 무게 용량을 초과하지 않는 한)
 		if (WeightLimitAddAmount > 0)
 		{
-
-			// (분배할 수량을 조정함)
 			ExistingItemStack->SetQuantity(ExistingItemStack->Quantity + WeightLimitAddAmount);
 			InventoryTotalWeight += (ExistingItemStack->GetItemSingleWeight() * WeightLimitAddAmount);
-
-			// (분배할 수량을 조정함)
 			AmountToDistribute -= WeightLimitAddAmount;
-
 			ItemIn->SetQuantity(AmountToDistribute);
-
-			// (TODO: 무게 용량을 초과하는 상황은 발생하지 않도록 이 로직을 개선해야 함)
-			// (최대 무게 용량에 도달하면 더 이상 루프를 실행할 필요가 없음)
 			if (InventoryTotalWeight >= InventoryWeightCapacity)
 			{
 				OnInventoryUpdated.Broadcast();
@@ -190,7 +178,6 @@ int32 US_InventoryComponent::HandleStackableItems(US_ItemBase* ItemIn, int32 Req
 				OnInventoryUpdated.Broadcast();
 				return RequestedAddAmount - AmountToDistribute;
 			}
-
 			return 0;
 		}
 		if (AmountToDistribute <= 0)
@@ -199,11 +186,9 @@ int32 US_InventoryComponent::HandleStackableItems(US_ItemBase* ItemIn, int32 Req
 			OnInventoryUpdated.Broadcast();
 			return RequestedAddAmount;
 		}
-
 		// (입력된 아이템의 유효한 부분 스택이 아직 있는지 확인)
 		ExistingItemStack = FindNextPartialStack(ItemIn);
 	}
-
 	// (더 이상 부분 스택을 찾을 수 없으면 새 스택을 추가할 수 있는지 확인)
 	if (InventoryContents.Num() + 1 <= InventorySlotsCapacity)
 	{
@@ -217,20 +202,16 @@ int32 US_InventoryComponent::HandleStackableItems(US_ItemBase* ItemIn, int32 Req
 				// (입력된 아이템의 수량을 조정하고, 인벤토리에서 수용할 수 있는 만큼 새로운 스택에 추가함)
 				AmountToDistribute -= WeightLimitAddAmount;
 				ItemIn->SetQuantity(AmountToDistribute);
-
 				// (일부 스택만 추가되므로 아이템의 복사본을 생성함)
 				AddNewItem(ItemIn->CreateItemCopy(), WeightLimitAddAmount);
 				return RequestedAddAmount - AmountToDistribute;
 			}
-
 			// (그렇지 않으면, 남은 모든 스택을 추가할 수 있음)
 			AddNewItem(ItemIn, AmountToDistribute);
 			return RequestedAddAmount;
 		}
-
 		return RequestedAddAmount - AmountToDistribute;
 	}
-
 	return 0;
 }
 
@@ -239,14 +220,10 @@ FItemAddResult US_InventoryComponent::HandleAddItem(US_ItemBase* InputItem)
 	if (GetOwner())
 	{
 		const int32 InitialRequestedAddAmount = InputItem->Quantity;
-
-		// handle non-stackable items
 		if (!InputItem->ItemNumericData.bIsStackable)
 		{
 			return HandleNonStackableItems(InputItem, InitialRequestedAddAmount);
 		}
-
-		// handle stackable
 		const int32 StackableAmountAdded = HandleStackableItems(InputItem, InitialRequestedAddAmount);
 
 		if (StackableAmountAdded == InitialRequestedAddAmount)
@@ -256,9 +233,7 @@ FItemAddResult US_InventoryComponent::HandleAddItem(US_ItemBase* InputItem)
 				, InitialRequestedAddAmount
 				, InputItem->ItemTextData.Name
 			));
-
 		}
-
 		if (StackableAmountAdded < InitialRequestedAddAmount && StackableAmountAdded > 0)
 		{
 			return FItemAddResult::AddedAll(StackableAmountAdded, FText::Format(
@@ -267,7 +242,6 @@ FItemAddResult US_InventoryComponent::HandleAddItem(US_ItemBase* InputItem)
 				, StackableAmountAdded
 			));
 		}
-
 		if (StackableAmountAdded <= 0)
 		{
 			return FItemAddResult::AddedNone(FText::Format(
@@ -279,6 +253,7 @@ FItemAddResult US_InventoryComponent::HandleAddItem(US_ItemBase* InputItem)
 	check(false);
 	return FItemAddResult::AddedNone(FText::FromString("TryAddItem fallthrough error. GetOwner() check somehow failed."));
 }
+
 
 void US_InventoryComponent::AddNewItem(US_ItemBase* Item, const int32 AmountToAdd)
 {
