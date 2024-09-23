@@ -16,7 +16,7 @@ AS_RockActor::AS_RockActor()
 		Mesh->SetStaticMesh(RockMeshRef.Object);
 	}
 
-	Health = 200.0f;
+	Health = 60.0f;
 	bHasFallen = false;
 	bIsShaking = false;
 	ShakeDuration = 0.0f;

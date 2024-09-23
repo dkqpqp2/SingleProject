@@ -79,7 +79,7 @@ void AS_CharacterBase::ComboActionBegin()
 {
     CurrentCombo = 1;
 
-    const float AttackSpeedRate = 1.0f;
+    const float AttackSpeedRate = 1.5f;
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
 
@@ -97,13 +97,14 @@ void AS_CharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProper
     CurrentCombo = 0;
 }
 
+
 void AS_CharacterBase::SetComboCheckTimer()
 {
     int32 ComboIndex = CurrentCombo - 1;
 
     ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
-    const float AttackSpeedRate = 1.0f;
+    const float AttackSpeedRate = 1.5f;
     float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) / AttackSpeedRate;
     if (ComboEffectiveTime > 0.0f)
     {

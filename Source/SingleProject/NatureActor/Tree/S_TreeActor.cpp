@@ -16,7 +16,7 @@ AS_TreeActor::AS_TreeActor()
 		Mesh->SetStaticMesh(TreeMeshRef.Object);
 	}
 
-	Health = 100.0f;
+	Health = 30.0f;
 	bHasFallen = false;
 	bIsShaking = false;
 	ShakeDuration = 0.0f;

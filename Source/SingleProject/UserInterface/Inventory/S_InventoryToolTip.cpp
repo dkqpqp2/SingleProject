@@ -12,78 +12,81 @@ void US_InventoryToolTip::NativeConstruct()
 
 	US_ItemBase* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference();
 
-	switch (ItemBeingHovered->ItemType)
+	if (!ItemBeingHovered)
+	{
+		return;
+	}
+
+	UpdateItemType(ItemBeingHovered);
+	UpdateItemText(ItemBeingHovered);
+	UpdateItemStats(ItemBeingHovered);
+}
+
+void US_InventoryToolTip::UpdateItemType(US_ItemBase* Item)
+{
+	switch (Item->ItemType)
 	{
 	case EItemType::Armor:
-		ItemType->SetText(FText::FromString(TEXT("방어구")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Visible);
+		SetItemTypeText(TEXT("방어구"), true);
 		break;
 	case EItemType::Weapon:
-		ItemType->SetText(FText::FromString(TEXT("무기")));
-		DamageValue->SetVisibility(ESlateVisibility::Visible);
-		ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
+		SetItemTypeText(TEXT("무기"), false);
 		break;
 	case EItemType::Helmet:
-		ItemType->SetText(FText::FromString(TEXT("투구")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Visible);
+		SetItemTypeText(TEXT("투구"), true);
 		break;
 	case EItemType::Shield:
-		ItemType->SetText(FText::FromString(TEXT("방패")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Visible);
+		SetItemTypeText(TEXT("방패"), true);
 		break;
 	case EItemType::Spell:
-		ItemType->SetText(FText::FromString(TEXT("마법 아이템")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
-		break; 
-	case EItemType::Boots:
+		SetIngredientItemTypeText(TEXT("마법 아이템"));
 		break;
 	case EItemType::Consumable:
-		ItemType->SetText(FText::FromString(TEXT("소모 아이템")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
+		SetIngredientItemTypeText(TEXT("소모 아이템"));
 		break;
 	case EItemType::Quest:
-		ItemType->SetText(FText::FromString(TEXT("퀘스트 아이템")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
+		SetIngredientItemTypeText(TEXT("퀘스트 아이템"));
 		UsageText->SetVisibility(ESlateVisibility::Collapsed);
 		break;
 	case EItemType::Mundane:
-		ItemType->SetText(FText::FromString(TEXT("일반 아이템")));
-		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-		ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
-		UsageText->SetVisibility(ESlateVisibility::Collapsed);
-		ItemName->SetVisibility(ESlateVisibility::Visible);
-		UsageText->SetVisibility(ESlateVisibility::Visible);
-		ItemDescription->SetVisibility(ESlateVisibility::Visible);
+		SetIngredientItemTypeText(TEXT("일반 아이템"));
 		break;
-	default:;
+	default:
+		break;
 	}
-	// 나중에 수정 데미지 방어력 0.0 으로 나옴 아이템 이름도 안나옴
-	const FString ItemNameInfo = ItemBeingHovered->ItemTextData.Name.ToString();
-	ItemName->SetText((FText::FromString(ItemNameInfo)));
-	UsageText->SetText((FText::FromString(ItemBeingHovered->ItemTextData.UsageText.ToString())));
-	ItemDescription->SetText((FText::FromString(ItemBeingHovered->ItemTextData.Description.ToString())));
+}
 
-	
-	const FString ArmorInfo = { TEXT("Armor: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.ArmorRating) };
-	ArmorRating->SetText(FText::FromString(ArmorInfo));
+void US_InventoryToolTip::SetItemTypeText(const FString& TypeText, bool bShowDamageOrArmorRating)
+{
+	ItemType->SetText(FText::FromString(TypeText));
+	DamageValue->SetVisibility(bShowDamageOrArmorRating ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+	ArmorRating->SetVisibility(bShowDamageOrArmorRating ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+}
 
-	const FString DamageInfo = { TEXT("Damage: ") + FString::SanitizeFloat(ItemBeingHovered->ItemStatistics.DamageValue) };
-	DamageValue->SetText(FText::FromString(DamageInfo));
+void US_InventoryToolTip::SetIngredientItemTypeText(const FString& TypeText)
+{
+	ItemType->SetText(FText::FromString(TypeText));
+	DamageValue->SetVisibility(ESlateVisibility::Collapsed);
+	ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
+}
 
-	const FString WeightInfo = { TEXT("무게: ") + FString::SanitizeFloat(ItemBeingHovered->GetItemStackWeight()) };
+void US_InventoryToolTip::UpdateItemText(US_ItemBase* Item)
+{
+	ItemName->SetText(FText::FromString(Item->ItemTextData.Name.ToString()));
+	UsageText->SetText(FText::FromString(Item->ItemTextData.UsageText.ToString()));
+	ItemDescription->SetText(FText::FromString(Item->ItemTextData.Description.ToString()));
+}
 
-	StackWeight->SetText(FText::FromString(WeightInfo));
+void US_InventoryToolTip::UpdateItemStats(US_ItemBase* Item)
+{
+	ArmorRating->SetText(FText::FromString(FString::Printf(TEXT("방어력: %.2f"), Item->ItemStatistics.ArmorRating)));
+	DamageValue->SetText(FText::FromString(FString::Printf(TEXT("공격력: %.2f"), Item->ItemStatistics.DamageValue)));
 
-	if (ItemBeingHovered->ItemNumericData.bIsStackable)
+	StackWeight->SetText(FText::FromString(FString::Printf(TEXT("무게: %.2f"), Item->GetItemStackWeight())));
+
+	if (Item->ItemNumericData.bIsStackable)
 	{
-		const FString StackInfo = { TEXT("최대 개수: ") + FString::FromInt(ItemBeingHovered->ItemNumericData.MaxStackSize) };
-		MaxStackSize->SetText(FText::FromString(StackInfo));
+		MaxStackSize->SetText(FText::FromString(FString::Printf(TEXT("최대 개수: %d"), Item->ItemNumericData.MaxStackSize)));
 	}
 	else
 	{

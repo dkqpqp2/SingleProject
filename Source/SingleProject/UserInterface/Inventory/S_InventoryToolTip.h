@@ -43,5 +43,10 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+	void UpdateItemType(US_ItemBase* Item);
+	void SetItemTypeText(const FString& TypeText, bool bShowDamageOrArmorRating);
+	void SetIngredientItemTypeText(const FString& TypeText);
+	void UpdateItemText(US_ItemBase* Item);
+	void UpdateItemStats(US_ItemBase* Item);
 	
 };

@@ -41,4 +41,7 @@ protected:
 	void SetInfoText() const;
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	void HandleItemDrop(US_ItemBase* Item);
+
 };

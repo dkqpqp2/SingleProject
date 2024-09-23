@@ -74,7 +74,7 @@ bool UBTTask_RunawayFromPlayer::DetectAndSetTarget(UBehaviorTreeComponent& Owner
 
 	if (bResult)
 	{
-		for (const auto& OverlapResult : OverlapResults)
+		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
 			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
 			if (Pawn && Pawn->GetController()->IsPlayerController())
@@ -91,7 +91,6 @@ bool UBTTask_RunawayFromPlayer::DetectAndSetTarget(UBehaviorTreeComponent& Owner
 				}
 
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AS_AIController::TargetKey, Pawn);
-				//DrawDebugLine(World, Center, Pawn->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return true;
 			}
 		}
@@ -128,7 +127,7 @@ void UBTTask_RunawayFromPlayer::RunAwayFromPlayer(UBehaviorTreeComponent& OwnerC
 	APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AS_AIController::TargetKey));
 	if (Target)
 	{
-		float Random = FMath::RandRange(1000.0f, 2000.0f);
+		float Random = FMath::RandRange(3000.0f, 5000.0f);
 		FVector DirectionAwayFromPlayer = (Center - Target->GetActorLocation()).GetSafeNormal();
 		FVector RunawayLocation = Center + DirectionAwayFromPlayer * Random;
 

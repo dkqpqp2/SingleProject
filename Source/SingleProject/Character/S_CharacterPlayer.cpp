@@ -41,7 +41,7 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 
 	PlayerInventory = CreateDefaultSubobject<US_InventoryComponent>(TEXT("PlayerInventory"));
 	PlayerInventory->SetSlotsCapacity(30);
-	PlayerInventory->SetWeightCapacity(150.0f);
+	PlayerInventory->SetWeightCapacity(500.0f);
 
 	PlayerEquipment = CreateDefaultSubobject<US_EquipmentComponent>(TEXT("PlayerEquipment"));
 	PlayerEquipment->SetEquipmentTotalDamage(15);

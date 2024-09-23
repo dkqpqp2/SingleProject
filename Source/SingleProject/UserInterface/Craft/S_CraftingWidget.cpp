@@ -65,8 +65,7 @@ void US_CraftingWidget::PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTabl
             FItemData* ItemRow = DataTable->FindRow<FItemData>(RowName, "");
             if (ItemRow)
             {
-                //UHorizontalBox* HorizontalBox = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
-                ItemButton = WidgetTree->ConstructWidget<US_CraftItemButtonWidget>(ButtonListClass);
+                ItemButton = CreateWidget<US_CraftItemButtonWidget>(GetWorld(), ButtonListClass);
                 if (ItemButton)
                 {
                     ItemButton->SetupButton(ItemRow->ID, ItemRow->ItemTextData.Name);
@@ -74,15 +73,6 @@ void US_CraftingWidget::PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTabl
                     ItemListScrollBox->AddChild(ItemButton);
                     CachedItemDataMap.Add(ItemRow->ID, *ItemRow);
                 }
-                //UTextBlock* ButtonText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-                //UImage* ItemImage = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-
-                //ItemButton->AddChild(HorizontalBox);
-
-                //ItemImage->SetBrushFromTexture(ItemRow->ItemAssetData.Icon);
-                //HorizontalBox->AddChild(ItemImage);
-                //ButtonText->SetText(FText::FromName(ItemRow->ID));
-                //HorizontalBox->AddChild(ButtonText);
             }
         }
     }
@@ -93,7 +83,6 @@ void US_CraftingWidget::PopulateItemList(TArray<TObjectPtr<UDataTable>> DataTabl
 void US_CraftingWidget::SetSelectItemButton(const FName InItemName)
 {
     SetItemName = InItemName;
-    //GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("SetSelectItemButton : %s"), *SetItemName.ToString()));
 }
 
 void US_CraftingWidget::OnItemClicked(FName ItemID)
@@ -120,13 +109,10 @@ void US_CraftingWidget::CraftItem(const FItemData& ItemData)
             InventoryReference->RemoveAmountOfItem(InventoryItem, Ingredient.AmountRequired);
         }
     }
-    // StaticClass 넣는 이유
     US_ItemBase* CraftingItem = NewObject<US_ItemBase>();
 
     CraftingItem->SetCraftItem(PlayerCharacter,ItemData);
 
-    //InventoryReference->HandleAddItem(CraftingItem->CreateCraftItem(PlayerCharacter,ItemData));
-    // 여기 엑세스 읽기 오류 발생
     InventoryReference->HandleAddItem(CraftingItem);
     // UI 또는 인벤토리 업데이트
     InventoryReference->OnInventoryUpdated.Broadcast();
@@ -155,12 +141,10 @@ bool US_CraftingWidget::CanCraftItem(const FItemData& ItemData)
 
 void US_CraftingWidget::UpdateItemDescription(const FItemData& ItemData)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Black, FString::Printf(TEXT("%s"), *ItemData.ItemTextData.Name.ToString()));
     ACharacter* OwningPlayerCharacter = Cast<ACharacter>(GetOwningPlayerPawn());
     if (ItemDescriptionText)
     {
         FString DescriptionText;
-        FString LogMessage;
 
         // 재료 정보를 표시
         InventoryReference = OwningPlayerCharacter->FindComponentByClass<US_InventoryComponent>();
@@ -172,45 +156,24 @@ void US_CraftingWidget::UpdateItemDescription(const FItemData& ItemData)
             {
                 ItemName->SetText(ItemData.ItemTextData.Name);
                 ItemDescriptionText->SetText(FText::FromString(TEXT("인벤토리에 재료가 부족합니다")));
-                GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("None Items"));
                 return;
             }
-            for (US_ItemBase* Item : AllItems)
-            {
-                if (Item)
-                {
-                    InventoryLogMessage += FString::Printf(TEXT("ItemID: %s, Quantity: %d\n"),
-                        *Item->ID.ToString(), Item->Quantity);
-                }
-            }
-
-            GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, InventoryLogMessage);
-
             for (const FIngredientData& Ingredient : ItemData.Ingredients)
             {
                 US_ItemBase* InventoryItem = InventoryReference->FindItemByID(Ingredient.IngredientID);
                 int32 ItemQuantity = InventoryItem ? InventoryItem->Quantity : 0;
 
-                DescriptionText += FString::Printf(TEXT("DescriptionText %s: %d / %d\n"),
-                    *Ingredient.IngredientID.ToString(), ItemQuantity, Ingredient.AmountRequired);
+                DescriptionText += FString::Printf(TEXT("%s: %d / %d\n"),
+                    *Ingredient.Name.ToString(), ItemQuantity, Ingredient.AmountRequired);
             }
-            LogMessage += FString::Printf(TEXT("ItemTextData: %s\n"), *ItemData.ItemTextData.Name.ToString());
 
-            for (const FIngredientData& Ingredient : ItemData.Ingredients)
-            {
-                LogMessage += FString::Printf(TEXT("IngredientID: %s, AmountRequired: %d\n"),
-                    *Ingredient.IngredientID.ToString(), Ingredient.AmountRequired);
-            }
         }
-        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, LogMessage);
-        //// 텍스트 업데이트
+        // 텍스트 업데이트
         ItemName->SetText(ItemData.ItemTextData.Name);
         ItemDescriptionText->SetText(FText::FromString(DescriptionText));
-        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DescriptionText);
         OnChangeTextDelegate.Broadcast();
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("ItemDescriptionText 또는 ItemName이 null"));
     }
 }

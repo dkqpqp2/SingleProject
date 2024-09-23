@@ -62,41 +62,53 @@ void US_InventoryPanel::RefreshInventory()
 	}
 }
 
-
-
-
 bool US_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 
 	const US_ItemDragDropOperation* ItemDragDropOperation = Cast<US_ItemDragDropOperation>(InOperation);
-
 	if (ItemDragDropOperation->SourceItem && InventoryReference)
 	{
-		switch (ItemDragDropOperation->SourceItem->ItemType)
-		{
-		case EItemType::Weapon:
-			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Weapon, TEXT("WeaponSocket"));
-			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
-			break;
-		case EItemType::Armor:
-			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Armor, TEXT("ArmorSocket"));
-			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
-			break;
-		case EItemType::Helmet:
-			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Helmet, TEXT("HelmetSocket"));
-			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
-			break;
-		case EItemType::Shield:
-			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Shield, TEXT("ShieldSocket"));
-			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
-			break;
-		case EItemType::Boots:
-			ItemDragDropOperation->SourceItem->OwningEquipment->UnequipItem(ESlotName::Boots, TEXT("BootsSocket"));
-			ItemDragDropOperation->SourceItem->OwningInventory->HandleAddItem(ItemDragDropOperation->SourceItem);
-			break;
-		default:;
-		}
+		HandleItemDrop(ItemDragDropOperation->SourceItem);
 		return true;
 	}
 	return false;
+}
+
+
+void US_InventoryPanel::HandleItemDrop(US_ItemBase* Item)
+{
+	if (!Item || !Item->OwningEquipment || !Item->OwningInventory)
+	{
+		return;
+	}
+
+	ESlotName SlotName;
+	FString SocketName;
+	switch (Item->ItemType)
+	{
+	case EItemType::Weapon:
+		SlotName = ESlotName::Weapon;
+		SocketName = TEXT("WeaponSocket");
+		break;
+	case EItemType::Armor:
+		SlotName = ESlotName::Armor;
+		SocketName = TEXT("ArmorSocket");
+		break;
+	case EItemType::Helmet:
+		SlotName = ESlotName::Helmet;
+		SocketName = TEXT("HelmetSocket");
+		break;
+	case EItemType::Shield:
+		SlotName = ESlotName::Shield;
+		SocketName = TEXT("ShieldSocket");
+		break;
+	case EItemType::Boots:
+		SlotName = ESlotName::Boots;
+		SocketName = TEXT("BootsSocket");
+		break;
+	default:
+		return;
+	}
+	Item->OwningEquipment->UnequipItem(SlotName, *SocketName);
+	Item->OwningInventory->HandleAddItem(Item);
 }

@@ -112,17 +112,6 @@ void US_EquipmentPanel::RefreshEquipmentSlot()
                
             }
         }
-        /*US_ItemBase* Weapon = OwningEquipment->GetEquippedItem(ESlotName::Weapon);
-        if (Weapon)
-        {
-            WeaponSlot->SetItemReference(Weapon);
-            WeaponSlot->UpdateSlot();
-        }
-        else
-        {
-            WeaponSlot->SetItemReference(nullptr);
-            WeaponSlot->UpdateSlot();
-        }*/
     }
     SetInfoText();
 }

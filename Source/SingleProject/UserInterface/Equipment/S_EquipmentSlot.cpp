@@ -78,7 +78,6 @@ FReply US_EquipmentSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 void US_EquipmentSlot::OnItemClicked()
 {
 	ACharacter* OwningPlayerCharacter = Cast<ACharacter>(GetOwningPlayerPawn());
-	//OwningPlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningLocalPlayer());
 	if (OwningPlayerCharacter && EquippedItem)
 	{
 		InventoryComponent = OwningPlayerCharacter->FindComponentByClass<US_InventoryComponent>();
@@ -98,8 +97,6 @@ void US_EquipmentSlot::OnItemClicked()
 			{
 				FName SocketName = SlotToSocketMap[SlotName];
 				EquipmentComponent->UnequipItem(SlotName, SocketName);
-
-				//EquipmentComponent->UnequipItem(ESlotName::Weapon, TEXT("WeaponSocket"));
 			}
 		}
 		
@@ -146,7 +143,8 @@ bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 
 	if (ItemDragDropOperation && ItemDragDropOperation->SourceItem)
 	{
-		switch (ItemDragDropOperation->SourceItem->ItemType)
+		EquipItemToSlot(ItemDragDropOperation->SourceItem);
+		/*switch (ItemDragDropOperation->SourceItem->ItemType)
 		{
 		case EItemType::Weapon:
 			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), ItemDragDropOperation->SourceItem);
@@ -169,10 +167,37 @@ bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
 			break;
 		default:;
-		}
+		}*/
 		return true;
 	}
 	return false;
+}
+
+void US_EquipmentSlot::EquipItemToSlot(US_ItemBase* Item)
+{
+	if (!Item)
+	{
+		return;
+	}
+
+	switch (Item->ItemType)
+	{
+	case EItemType::Weapon:
+		Item->OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), Item);
+		break;
+	case EItemType::Armor:
+		Item->OwningEquipment->EquipItem(ESlotName::Armor, TEXT("ArmorSocket"), Item);
+		break;
+	case EItemType::Helmet:
+		Item->OwningEquipment->EquipItem(ESlotName::Helmet, TEXT("HelmetSocket"), Item);
+		break;
+	case EItemType::Shield:
+		Item->OwningEquipment->EquipItem(ESlotName::Shield, TEXT("ShieldSocket"), Item);
+		break;
+	default:
+		break;
+	}
+	Item->OwningInventory->RemoveAmountOfItem(Item, Item->Quantity);
 }
 
 void US_EquipmentSlot::UpdateSlot()

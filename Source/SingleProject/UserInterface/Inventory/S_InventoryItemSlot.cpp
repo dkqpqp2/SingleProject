@@ -77,7 +77,6 @@ FReply US_InventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 void US_InventoryItemSlot::OnItemClicked()
 {
 	OwningPlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningPlayerPawn());
-	//OwningPlayerCharacter = Cast<AS_CharacterPlayer>(GetOwningLocalPlayer());
 	if (OwningPlayerCharacter && ItemReference)
 	{
 		ItemReference->Use(OwningPlayerCharacter, ItemReference);
