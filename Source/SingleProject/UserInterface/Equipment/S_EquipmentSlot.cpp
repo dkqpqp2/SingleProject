@@ -144,30 +144,6 @@ bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 	if (ItemDragDropOperation && ItemDragDropOperation->SourceItem)
 	{
 		EquipItemToSlot(ItemDragDropOperation->SourceItem);
-		/*switch (ItemDragDropOperation->SourceItem->ItemType)
-		{
-		case EItemType::Weapon:
-			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), ItemDragDropOperation->SourceItem);
-			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
-			break;
-		case EItemType::Armor:
-			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Armor, TEXT("ArmorSocket"), ItemDragDropOperation->SourceItem);
-			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
-			break;
-		case EItemType::Helmet:
-			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Helmet, TEXT("HelmetSocket"), ItemDragDropOperation->SourceItem);
-			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
-			break;
-		case EItemType::Shield:
-			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Shield, TEXT("ShieldSocket"), ItemDragDropOperation->SourceItem);
-			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
-			break;
-		case EItemType::Boots:
-			ItemDragDropOperation->SourceItem->OwningEquipment->EquipItem(ESlotName::Boots, TEXT("BootsSocket"), ItemDragDropOperation->SourceItem);
-			ItemDragDropOperation->SourceItem->OwningInventory->RemoveAmountOfItem(ItemDragDropOperation->SourceItem, ItemDragDropOperation->SourceItem->Quantity);
-			break;
-		default:;
-		}*/
 		return true;
 	}
 	return false;
