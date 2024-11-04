@@ -73,6 +73,7 @@ public:
 
 	TObjectPtr<US_ItemBase> CreateItemCopy() const;
 	TObjectPtr<US_ItemBase> CreateItem(const AS_CharacterPlayer* Player);
+	static TObjectPtr<US_ItemBase> CreateItem(const UObject* InWorldContext, const FItemData& InItemData);
 
 	void SetOwner(AS_CharacterPlayer* Character);
 

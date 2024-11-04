@@ -26,6 +26,19 @@ US_ItemBase* US_InventoryComponent::FindItemByID(FName ItemID) const
 	return nullptr;
 }
 
+bool US_InventoryComponent::CheckIngredients(const TArray<FCraftMaterialData>& RequiredMaterials) const
+{
+	for(const FCraftMaterialData& RequiredMaterial : RequiredMaterials)
+	{
+		US_ItemBase* ItemInInventroy = FindItemByID(RequiredMaterial.ID);
+		if(ItemInInventroy == nullptr || ItemInInventroy->Quantity < RequiredMaterial.RequiredCount)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 TArray<US_ItemBase*> US_InventoryComponent::GetAllItems() const
 {
 	return InventoryItems;

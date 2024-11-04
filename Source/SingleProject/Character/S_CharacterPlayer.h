@@ -99,6 +99,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Character | Equipment")
 	TObjectPtr<class US_EquipmentComponent> PlayerEquipment;
 
+	UPROPERTY(VisibleAnywhere, Category = "Character | Equipment")
+	TObjectPtr<class US_NewCraftComponent> CraftComponent;
+
 	float InteractionCheckFrequency;
 
 	float InteractionCheckDistance;
@@ -154,6 +157,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
 	TObjectPtr<class UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> CraftMenu;
 // 함수
 protected:
 	virtual void PostInitializeComponents() override;
@@ -163,6 +169,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ToggleMenu();
+	void ToggleCraft();
 
 	void Aim();
 	void StopAiming();

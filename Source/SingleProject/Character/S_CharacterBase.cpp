@@ -34,19 +34,19 @@ AS_CharacterBase::AS_CharacterBase()
     GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
     GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
-    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Fantasy_Pack/Characters/Warrior/Mesh/SK_Warrior.SK_Warrior'"));
     if (CharacterMeshRef.Object)
     {
         GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
     }
 
-    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Character/AddAnimation/ABP_CharacterPlayer.ABP_CharacterPlayer_C"));
+    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Character/AddAnimation/Warrior/ABP_Warrior.ABP_Warrior_C"));
     if (AnimInstanceClassRef.Class)
     {
         GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
     }
 
-    static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Character/Blueprints/Attack/AM_ComboAttack.AM_ComboAttack'"));
+    static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Character/Blueprints/Attack/AM_WarriorComboAttack.AM_WarriorComboAttack'"));
     if (ComboActionMontageRef.Object)
     {
         ComboActionMontage = ComboActionMontageRef.Object;
@@ -78,8 +78,9 @@ void AS_CharacterBase::ProcessComboCommand()
 void AS_CharacterBase::ComboActionBegin()
 {
     CurrentCombo = 1;
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
-    const float AttackSpeedRate = 1.5f;
+    const float AttackSpeedRate = 1.3f;
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
 
@@ -95,16 +96,17 @@ void AS_CharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProper
 {
     ensure(CurrentCombo != 0);
     CurrentCombo = 0;
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 
 void AS_CharacterBase::SetComboCheckTimer()
 {
     int32 ComboIndex = CurrentCombo - 1;
-
+    
     ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
-    const float AttackSpeedRate = 1.5f;
+    const float AttackSpeedRate = 1.3f;
     float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) / AttackSpeedRate;
     if (ComboEffectiveTime > 0.0f)
     {

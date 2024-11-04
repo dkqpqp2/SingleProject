@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "S_InventoryComponent.generated.h"
 
+struct FCraftMaterialData;
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 class US_ItemBase;
@@ -118,6 +119,7 @@ public:
 
 	UFUNCTION(Category = "Inventory")
 	US_ItemBase* FindItemByID(FName ItemID) const;
+	bool CheckIngredients(const TArray<FCraftMaterialData>& RequiredMaterials) const;
 
 	TArray<US_ItemBase*> GetAllItems() const;
 protected:

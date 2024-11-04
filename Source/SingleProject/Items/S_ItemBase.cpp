@@ -8,6 +8,7 @@
 #include "Character/S_CharacterPlayer.h"
 #include "Components/S_EquipmentComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "UserInterface/Equipment/S_EquipmentPanel.h"
 
 
@@ -67,6 +68,30 @@ TObjectPtr<US_ItemBase> US_ItemBase::CreateItem(const AS_CharacterPlayer* Player
 	return ItemCopy;
 }
 
+TObjectPtr<US_ItemBase> US_ItemBase::CreateItem(const UObject* InWorldContext, const FItemData& InItemData)
+{
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(InWorldContext, 0);
+	if (Player == nullptr)
+	{
+		return nullptr;
+	}
+	US_ItemBase* NewItem = NewObject<US_ItemBase>(StaticClass());
+
+	NewItem->ID = InItemData.ID;
+	NewItem->Quantity = 1;
+	NewItem->ItemQuality = InItemData.ItemQuality;
+	NewItem->ItemType = InItemData.ItemType;
+	NewItem->ItemNumericData = InItemData.ItemNumericData;
+	NewItem->ItemStatistics = InItemData.ItemStaistics;
+	NewItem->ItemAssetData = InItemData.ItemAssetData;
+
+	//플레이어가 가지는 인벤토리 및 장비 컴포넌트 세팅
+	//ItemCopy->OwningPlayer = Player; 이거로 하면 나중에 다른 컴포넌트 찾아서 사용도 가능
+	NewItem->OwningInventory = Player->FindComponentByClass<US_InventoryComponent>();
+	NewItem->OwningEquipment = Player->FindComponentByClass<US_EquipmentComponent>();
+
+	return NewItem;
+}
 void US_ItemBase::SetOwner(AS_CharacterPlayer* Character)
 {
 	if (!Character)

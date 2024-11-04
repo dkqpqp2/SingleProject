@@ -6,6 +6,7 @@
 #include "UserInterface/Interaction/S_InteractionWidget.h"
 #include "UserInterface/Equipment/S_EquipmentPanel.h"
 #include "UserInterface/Craft/S_CraftingWidget.h"
+#include "UserInterface/NewCraft/S_NewCraftPanel.h"
 
 AS_HUD::AS_HUD()
 {
@@ -37,6 +38,13 @@ void AS_HUD::BeginPlay()
 		CrosshairWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	if (NewCraftWidgetClass)
+	{
+		NewCraftPanelWidget = CreateWidget<US_NewCraftPanel>(GetWorld(), NewCraftWidgetClass);
+		NewCraftPanelWidget->AddToViewport();
+		NewCraftPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
 }
 
 void AS_HUD::DisplayMenu()
@@ -61,21 +69,62 @@ void AS_HUD::HideMenu()
 
 void AS_HUD::ToggleMenu()
 {
-	
-	if (bIsMenuVisible)
+	if (!bIsCraftVisible)
 	{
-		HideMenu();
+		if (bIsMenuVisible)
+		{
+			HideMenu();
 
-		const FInputModeGameOnly InputMode;
-		GetOwningPlayerController()->SetInputMode(InputMode);
-		GetOwningPlayerController()->SetShowMouseCursor(false);
+			const FInputModeGameOnly InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(false);
+		}
+		else
+		{
+			DisplayMenu();
+			const FInputModeGameAndUI InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(true);
+		}
 	}
-	else
+}
+
+void AS_HUD::DisplayCraft()
+{
+	if (NewCraftPanelWidget)
 	{
-		DisplayMenu();
-		const FInputModeGameAndUI InputMode;
-		GetOwningPlayerController()->SetInputMode(InputMode);
-		GetOwningPlayerController()->SetShowMouseCursor(true);
+		bIsCraftVisible = true;
+		NewCraftPanelWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AS_HUD::HideCraft()
+{
+	if (NewCraftPanelWidget)
+	{
+		bIsCraftVisible = false;
+		NewCraftPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void AS_HUD::ToggleCraft()
+{
+	if (!bIsMenuVisible)
+	{
+		if (bIsCraftVisible)
+		{
+			HideCraft();
+			const FInputModeGameOnly InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(false);
+		}
+		else
+		{
+			DisplayCraft();
+			const FInputModeGameAndUI InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(true);
+		}
 	}
 }
 

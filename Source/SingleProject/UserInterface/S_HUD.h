@@ -11,6 +11,7 @@ class US_MainMenu;
 class US_InteractionWidget;
 class US_EquipmentPanel;
 class US_CraftingWidget;
+class US_NewCraftPanel;
 struct FInteractableData;
 /**
  * 
@@ -36,7 +37,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	TSubclassOf<US_CraftingWidget> CraftingWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<US_NewCraftPanel> NewCraftWidgetClass;
+
 	bool bIsMenuVisible;
+	bool bIsCraftVisible;
 
 	AS_HUD();
 
@@ -44,6 +49,9 @@ public:
 	void HideMenu();
 	void ToggleMenu();
 
+	void DisplayCraft();
+	void HideCraft();
+	void ToggleCraft();
 
 	void ShowCrosshair();
 	void HideCrosshair();
@@ -69,6 +77,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class US_CraftingWidget> CraftingWidget;
+
+	UPROPERTY()
+	TObjectPtr<class US_NewCraftPanel> NewCraftPanelWidget;
 
 	virtual void BeginPlay() override;
 };

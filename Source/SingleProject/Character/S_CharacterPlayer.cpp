@@ -5,6 +5,7 @@
 #include "UserInterface/S_HUD.h"
 #include "Components/S_InventoryComponent.h"
 #include "Components/S_EquipmentComponent.h"
+#include "Components/S_NewCraftComponent.h"
 #include "World/S_Pickup.h"
 #include "Items/S_ItemBase.h"
 #include "Components/S_CharacterStatComponent.h"
@@ -46,6 +47,8 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	PlayerEquipment = CreateDefaultSubobject<US_EquipmentComponent>(TEXT("PlayerEquipment"));
 	PlayerEquipment->SetEquipmentTotalDamage(15);
 	PlayerEquipment->SetEquipmentTotalArmor(5);
+
+	CraftComponent = CreateDefaultSubobject<US_NewCraftComponent>(TEXT("CraftComponent"));
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -118,6 +121,12 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	if (nullptr != InputActionAttackRef.Object)
 	{
 		AttackAction = InputActionAttackRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionCraftMenuRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_CraftMenu.IA_CraftMenu'"));
+	if (nullptr != InputActionCraftMenuRef.Object)
+	{
+		CraftMenu = InputActionCraftMenuRef.Object;
 	}
 
 	Stat = CreateDefaultSubobject<US_CharacterStatComponent>(TEXT("Stat"));
@@ -400,6 +409,15 @@ void AS_CharacterPlayer::ToggleMenu()
 	}
 }
 
+void AS_CharacterPlayer::ToggleCraft()
+{
+	HUD->ToggleCraft();
+	if (HUD->bIsCraftVisible)
+	{
+		StopAiming();
+	}
+}
+
 void AS_CharacterPlayer::Aim()
 {
 	if (!HUD->bIsMenuVisible)
@@ -497,6 +515,7 @@ void AS_CharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AS_CharacterPlayer::Attack);
 	EnhancedInputComponent->BindAction(AimingAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::StopAiming);
 	EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleMenu);
+	EnhancedInputComponent->BindAction(CraftMenu, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleCraft);
 
 }
 

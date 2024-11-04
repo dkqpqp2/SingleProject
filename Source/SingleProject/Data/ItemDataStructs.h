@@ -139,3 +139,48 @@ struct FItemData : public FTableRowBase
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	TArray<FIngredientData> Ingredients;
 };
+
+USTRUCT()
+struct FCraftResultData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FName ID;
+
+	UPROPERTY(EditAnywhere)
+	EItemType ItemType;
+};
+
+USTRUCT()
+struct FCraftMaterialData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FName ID;
+
+	UPROPERTY(EditAnywhere)
+	EItemType ItemType;
+
+	UPROPERTY(EditAnywhere)
+	int32 RequiredCount;
+};
+
+USTRUCT()
+struct FCraftItemData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	FName ID;
+	
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	FText CraftDescription;
+
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	FCraftResultData ResultItemData;
+	
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+	TArray<FCraftMaterialData> MaterialItemDataList;
+};
