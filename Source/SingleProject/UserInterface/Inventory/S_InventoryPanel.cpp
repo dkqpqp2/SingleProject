@@ -2,7 +2,6 @@
 
 
 #include "S_InventoryPanel.h"
-#include "UserInterface/Inventory/S_InventoryPanel.h"
 #include "UserInterface/Inventory/S_InventoryItemSlot.h"
 #include "UserInterface/Inventory/S_ItemDragDropOperation.h"
 #include "Components/S_InventoryComponent.h"
@@ -23,6 +22,14 @@ void US_InventoryPanel::NativeOnInitialized()
 		InventoryReference = PlayerCharacter->GetInventory();
 		if (InventoryReference)
 		{
+			/*const int32 CurrentItemCount = InventoryReference->GetInventoryContents().Num();
+			const int32 EmptySlotCount = InventoryReference->GetSlotsCapacity() - CurrentItemCount;
+			for(int i = 0; i < EmptySlotCount; i++)
+			{
+				US_InventoryItemSlot* EmptySlot = CreateWidget<US_InventoryItemSlot>(this, InventorySlotClass);
+				EmptySlot->SetItemReference(nullptr);
+				InventoryWrapBox->AddChildToWrapBox(EmptySlot);
+			}*/
 			InventoryReference->OnInventoryUpdated.AddUObject(this, &US_InventoryPanel::RefreshInventory);
 			SetInfoText();
 		}
@@ -50,6 +57,7 @@ void US_InventoryPanel::RefreshInventory()
 	if (InventoryReference && InventorySlotClass)
 	{
 		InventoryWrapBox->ClearChildren();
+		
 		for (US_ItemBase* const& InventoryItem : InventoryReference->GetInventoryContents())
 		{
 			US_InventoryItemSlot* ItemSlot = CreateWidget<US_InventoryItemSlot>(this, InventorySlotClass);
@@ -57,6 +65,15 @@ void US_InventoryPanel::RefreshInventory()
 
 			InventoryWrapBox->AddChildToWrapBox(ItemSlot);
 		}
+		
+		/*const int32 CurrentItemCount = InventoryReference->GetInventoryContents().Num();
+		const int32 EmptySlotCount = InventoryReference->GetSlotsCapacity() - CurrentItemCount;
+		for(int i = 0; i < EmptySlotCount; i++)
+		{
+			US_InventoryItemSlot* EmptySlot = CreateWidget<US_InventoryItemSlot>(this, InventorySlotClass);
+			EmptySlot->SetItemReference(nullptr);
+			InventoryWrapBox->AddChildToWrapBox(EmptySlot);
+		}*/
 
 		SetInfoText();
 	}

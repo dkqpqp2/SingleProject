@@ -28,7 +28,7 @@ void US_EquipmentComponent::EquipItem(const ESlotName SlotName, const FName& Soc
 	}
 	if (IsSlotOccupied(SlotName))
 	{
-		return;
+		UnequipItem(SlotName, SocketName);
 	}
 
 	EquippedItems.Add(SlotName, Item);

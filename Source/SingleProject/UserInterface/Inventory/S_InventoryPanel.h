@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "S_InventoryPanel.generated.h"
 
+class US_ItemBase;
 class US_InventoryItemSlot;
 /**
  * 

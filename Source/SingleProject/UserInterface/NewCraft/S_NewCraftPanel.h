@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "S_NewCraftPanel.generated.h"
 
+class US_NewCraftTreeItemEntry;
 /**
  * 
  */

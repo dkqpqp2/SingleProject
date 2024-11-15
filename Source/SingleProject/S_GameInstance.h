@@ -25,9 +25,22 @@ public:
 	template<typename T>
 	TArray<FName> GetAllDataID() const;
 
+	template<typename T>
+	static const T* GetSkillData(const UObject* InWorldContext, const FName& InID);
+
+	template<typename T>
+	const T* GetSkillData(const FName& InID) const;
+
+	// 스킬 데이터 테이블 내 모든 ID 조회
+	template<typename T>
+	TArray<FName> GetAllSkillIDs() const;
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UDataTable>> AllTable;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UDataTable> SkillTable;
 };
 
 // const T* 사용 하므로 데이터 변경없이 읽기 전용으로 사용할거임
@@ -80,6 +93,38 @@ TArray<FName> US_GameInstance::GetAllDataID() const
 			NameList = DataTable->GetRowNames();
 			break;
 		}
+	}
+
+	return NameList;
+}
+
+template <typename T>
+const T* US_GameInstance::GetSkillData(const UObject* InWorldContext, const FName& InID)
+{
+	return Get(InWorldContext)->GetSkillData<T>(InID);
+}
+
+template <typename T>
+const T* US_GameInstance::GetSkillData(const FName& InID) const
+{
+	if (SkillTable && SkillTable->GetRowStruct() == T::StaticStruct())
+	{
+		if (const uint8* Data = *(SkillTable->GetRowMap().Find(InID)))
+		{
+			return reinterpret_cast<const T*>(Data);
+		}
+	}
+	return nullptr;
+}
+
+template<typename T>
+TArray<FName> US_GameInstance::GetAllSkillIDs() const
+{
+	TArray<FName> NameList;
+
+	if (SkillTable && SkillTable->GetRowStruct() == T::StaticStruct())
+	{
+		NameList = SkillTable->GetRowNames();
 	}
 
 	return NameList;

@@ -21,12 +21,11 @@ public class SingleProject : ModuleRules
             "Niagara",
             "NavigationSystem",
             "AIModule",
-            "GamePlayTasks",
             "SlateCore",
             "Slate",
             "Paper2D",
-			"ApexDestruction"
-
+			"ApexDestruction",
+			"GameplayTasks"
         });
 	}
 }

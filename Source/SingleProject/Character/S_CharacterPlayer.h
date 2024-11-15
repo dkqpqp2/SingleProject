@@ -160,6 +160,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
 	TObjectPtr<class UInputAction> CraftMenu;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> DashAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> SkillMenuAction;
 // 함수
 protected:
 	virtual void PostInitializeComponents() override;
@@ -170,6 +176,7 @@ protected:
 
 	void ToggleMenu();
 	void ToggleCraft();
+	void ToggleSkillMenu();
 
 	void Aim();
 	void StopAiming();
@@ -182,5 +189,25 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Attack();
+
+	FTimerHandle DashCooldownHandle;
+
+	bool bIsDashing = false;
+	float DashDistance = 500.0f;
+	float DashSpeed = 2000.0f;
+	float DashAcceleration = 2000.0f;
+	bool bIsDashCooldown = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	TObjectPtr<class UNiagaraSystem> DashEffect;
+	
+	void Dash();
+	void EndDash();
+	void ResetDashCooldown();
 	virtual void SetDead() override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SkillPoint")
+	int32 SkillPoint = 0;
+	
 };

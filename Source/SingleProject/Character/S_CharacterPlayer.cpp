@@ -22,6 +22,8 @@
 #include "Engine/DamageEvents.h"
 #include "Components/S_WidgetComponent.h"
 #include "UserInterface/UI/S_HpBarWidget.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 //Input
 #include "InputActionValue.h"
@@ -41,8 +43,8 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	CameraBoom->bUsePawnControlRotation = true;
 
 	PlayerInventory = CreateDefaultSubobject<US_InventoryComponent>(TEXT("PlayerInventory"));
-	PlayerInventory->SetSlotsCapacity(30);
-	PlayerInventory->SetWeightCapacity(500.0f);
+	PlayerInventory->SetSlotsCapacity(63);
+	PlayerInventory->SetWeightCapacity(800.0f);
 
 	PlayerEquipment = CreateDefaultSubobject<US_EquipmentComponent>(TEXT("PlayerEquipment"));
 	PlayerEquipment->SetEquipmentTotalDamage(15);
@@ -127,6 +129,18 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	if (nullptr != InputActionCraftMenuRef.Object)
 	{
 		CraftMenu = InputActionCraftMenuRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionDashRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Dash.IA_Dash'"));
+	if(nullptr != InputActionDashRef.Object)
+	{
+		DashAction = InputActionDashRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkillMenuRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_SkillMenu.IA_SkillMenu'"));
+	if(InputActionSkillMenuRef.Object != nullptr)
+	{
+		SkillMenuAction = InputActionSkillMenuRef.Object;
 	}
 
 	Stat = CreateDefaultSubobject<US_CharacterStatComponent>(TEXT("Stat"));
@@ -418,6 +432,15 @@ void AS_CharacterPlayer::ToggleCraft()
 	}
 }
 
+void AS_CharacterPlayer::ToggleSkillMenu()
+{
+	HUD->ToggleSkillMenu();
+	if(HUD->bIsSkillMenuVisible)
+	{
+		StopAiming();
+	}
+}
+
 void AS_CharacterPlayer::Aim()
 {
 	if (!HUD->bIsMenuVisible)
@@ -516,6 +539,8 @@ void AS_CharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(AimingAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::StopAiming);
 	EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleMenu);
 	EnhancedInputComponent->BindAction(CraftMenu, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleCraft);
+	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::Dash);
+	EnhancedInputComponent->BindAction(SkillMenuAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleSkillMenu);
 
 }
 
@@ -544,6 +569,68 @@ void AS_CharacterPlayer::Look(const FInputActionValue& Value)
 void AS_CharacterPlayer::Attack()
 {
 	ProcessComboCommand();
+}
+
+void AS_CharacterPlayer::Dash()
+{
+	if(!bIsDashCooldown &&!GetCharacterMovement()->IsFalling())
+	{
+		bIsDashing = true;
+
+		FVector DashStart = GetActorLocation();
+		FVector DashDirection = GetActorRotation().Vector();
+		FVector DashEnd = DashStart + DashDirection * DashDistance;
+
+		FHitResult HitResult;
+		FCollisionQueryParams TraceParams(NAME_None, false,this);
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, DashStart, DashEnd, ECC_Visibility, TraceParams);
+
+		if(bHit)
+		{
+			AActor* HitActor = HitResult.GetActor();
+			if(HitActor)
+			{
+				UNiagaraComponent* DashEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+					GetWorld(), DashEffect, DashStart, FRotator::ZeroRotator
+				);
+			}
+
+			GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+			GetCharacterMovement()->MaxAcceleration = DashAcceleration;
+
+			bIsDashCooldown = true;
+			GetWorldTimerManager().SetTimer(DashCooldownHandle, this, &AS_CharacterPlayer::EndDash, 0.5f, false);
+		}
+		else
+		{
+			UNiagaraComponent* DashEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			   GetWorld(), DashEffect, DashStart, FRotator::ZeroRotator
+		   );
+
+			// 대시 속도 변경
+			GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+			GetCharacterMovement()->MaxAcceleration = DashAcceleration;
+
+			// 대시 완료 후 쿨타임 시작
+			bIsDashCooldown = true;
+			GetWorldTimerManager().SetTimer(DashCooldownHandle, this, &AS_CharacterPlayer::EndDash, 0.5f, false);
+		}
+	}
+}
+
+void AS_CharacterPlayer::EndDash()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxAcceleration = 2048.0f;
+
+	bIsDashing = false;
+	GetWorldTimerManager().SetTimer(DashCooldownHandle, this, &AS_CharacterPlayer::ResetDashCooldown, 5.0f, false);
+}
+
+void AS_CharacterPlayer::ResetDashCooldown()
+{
+	bIsDashCooldown = false;
 }
 
 void AS_CharacterPlayer::SetDead()

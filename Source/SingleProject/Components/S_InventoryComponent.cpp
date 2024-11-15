@@ -215,8 +215,7 @@ int32 US_InventoryComponent::HandleStackableItems(US_ItemBase* ItemIn, int32 Req
 				// (입력된 아이템의 수량을 조정하고, 인벤토리에서 수용할 수 있는 만큼 새로운 스택에 추가함)
 				AmountToDistribute -= WeightLimitAddAmount;
 				ItemIn->SetQuantity(AmountToDistribute);
-				// (일부 스택만 추가되므로 아이템의 복사본을 생성함)
-				AddNewItem(ItemIn->CreateItemCopy(), WeightLimitAddAmount);
+				AddNewItem(ItemIn, WeightLimitAddAmount);
 				return RequestedAddAmount - AmountToDistribute;
 			}
 			// (그렇지 않으면, 남은 모든 스택을 추가할 수 있음)
@@ -276,6 +275,11 @@ void US_InventoryComponent::AddNewItem(US_ItemBase* Item, const int32 AmountToAd
 
 	InventoryContents.Add(NewItem);
 	InventoryTotalWeight += NewItem->GetItemStackWeight();
+	
+	/*Item->SetQuantity(AmountToAdd);
+	
+	InventoryContents.Add(Item);
+	InventoryTotalWeight += Item->GetItemStackWeight();*/
 	OnInventoryUpdated.Broadcast();
 }
 

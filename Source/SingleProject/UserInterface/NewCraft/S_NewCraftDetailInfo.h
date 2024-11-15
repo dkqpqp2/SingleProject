@@ -25,12 +25,6 @@ protected:
 	void OnClickedCraft();
 
 	void OnInventroyUpdated();
-
-	/*UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UImage> Img_ResultItem;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> Label_ResultName;*/
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> Label_Description;

@@ -2,11 +2,14 @@
 
 
 #include "S_HUD.h"
+
+#include "Skill/S_SkillPanel.h"
 #include "UserInterface/S_MainMenu.h"
 #include "UserInterface/Interaction/S_InteractionWidget.h"
 #include "UserInterface/Equipment/S_EquipmentPanel.h"
 #include "UserInterface/Craft/S_CraftingWidget.h"
 #include "UserInterface/NewCraft/S_NewCraftPanel.h"
+#include "UserInterface/Skill/S_SkillPanel.h"
 
 AS_HUD::AS_HUD()
 {
@@ -45,6 +48,13 @@ void AS_HUD::BeginPlay()
 		NewCraftPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	if(SkillPanelWidgetClass)
+	{
+		SkillPanelWidget = CreateWidget<US_SkillPanel>(GetWorld(), SkillPanelWidgetClass);
+		SkillPanelWidget->AddToViewport();
+		SkillPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
 }
 
 void AS_HUD::DisplayMenu()
@@ -69,7 +79,7 @@ void AS_HUD::HideMenu()
 
 void AS_HUD::ToggleMenu()
 {
-	if (!bIsCraftVisible)
+	if (!bIsCraftVisible && !bIsSkillMenuVisible)
 	{
 		if (bIsMenuVisible)
 		{
@@ -109,7 +119,7 @@ void AS_HUD::HideCraft()
 
 void AS_HUD::ToggleCraft()
 {
-	if (!bIsMenuVisible)
+	if (!bIsMenuVisible && !bIsSkillMenuVisible)
 	{
 		if (bIsCraftVisible)
 		{
@@ -141,6 +151,45 @@ void AS_HUD::HideCrosshair()
 	if (CrosshairWidget)
 	{
 		CrosshairWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void AS_HUD::ShowSkillPanel()
+{
+	if(SkillPanelWidget)
+	{
+		bIsSkillMenuVisible = true;
+		SkillPanelWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void AS_HUD::HideSkillPanel()
+{
+	if(SkillPanelWidget)
+	{
+		bIsSkillMenuVisible = false;
+		SkillPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void AS_HUD::ToggleSkillMenu()
+{
+	if (!bIsMenuVisible && !bIsCraftVisible)
+	{
+		if (bIsSkillMenuVisible)
+		{
+			HideSkillPanel();
+			const FInputModeGameOnly InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(false);
+		}
+		else
+		{
+			ShowSkillPanel();
+			const FInputModeGameAndUI InputMode;
+			GetOwningPlayerController()->SetInputMode(InputMode);
+			GetOwningPlayerController()->SetShowMouseCursor(true);
+		}
 	}
 }
 

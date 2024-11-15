@@ -17,7 +17,7 @@ void US_InventoryItemSlot::NativeOnInitialized()
     Super::NativeOnInitialized();
     if (ToolTipClass)
     {
-        US_InventoryToolTip* ToolTip = CreateWidget<US_InventoryToolTip>(this, ToolTipClass);
+	    US_InventoryToolTip* ToolTip = CreateWidget<US_InventoryToolTip>(this, ToolTipClass);
         ToolTip->InventorySlotBeingHovered = this;
         SetToolTip(ToolTip);
     }
@@ -56,12 +56,16 @@ void US_InventoryItemSlot::NativeConstruct()
 			ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
+	else
+	{
+		ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 FReply US_InventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
+	
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
