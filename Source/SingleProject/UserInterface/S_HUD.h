@@ -13,6 +13,7 @@ class US_EquipmentPanel;
 class US_CraftingWidget;
 class US_NewCraftPanel;
 class US_SkillPanel;
+class US_QuickSlotPanel;
 struct FInteractableData;
 /**
  * 
@@ -44,6 +45,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	TSubclassOf<US_SkillPanel> SkillPanelWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<US_QuickSlotPanel> QuickSlotPanelWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<US_QuickSlotPanel> QuickSlotPanelWidget;
+	
 	bool bIsMenuVisible;
 	bool bIsCraftVisible;
 	bool bIsSkillMenuVisible;
@@ -92,6 +99,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<US_SkillPanel> SkillPanelWidget;
+
+
 
 	virtual void BeginPlay() override;
 };

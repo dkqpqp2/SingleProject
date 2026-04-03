@@ -23,7 +23,6 @@ void US_NewCraftDetailInfo::NativeConstruct()
 	{
 		OwningInventory->OnInventoryUpdated.AddUObject(this, &ThisClass::OnInventroyUpdated);
 	}
-
 }
 
 void US_NewCraftDetailInfo::NativeDestruct()

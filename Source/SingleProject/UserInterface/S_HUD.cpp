@@ -3,6 +3,7 @@
 
 #include "S_HUD.h"
 
+#include "QuickSlot/S_QuickSlotPanel.h"
 #include "Skill/S_SkillPanel.h"
 #include "UserInterface/S_MainMenu.h"
 #include "UserInterface/Interaction/S_InteractionWidget.h"
@@ -13,7 +14,7 @@
 
 AS_HUD::AS_HUD()
 {
-
+	
 }
 
 void AS_HUD::BeginPlay()
@@ -53,6 +54,12 @@ void AS_HUD::BeginPlay()
 		SkillPanelWidget = CreateWidget<US_SkillPanel>(GetWorld(), SkillPanelWidgetClass);
 		SkillPanelWidget->AddToViewport();
 		SkillPanelWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	if(QuickSlotPanelWidgetClass)
+	{
+		QuickSlotPanelWidget = CreateWidget<US_QuickSlotPanel>(GetWorld(), QuickSlotPanelWidgetClass);
+		QuickSlotPanelWidget->AddToViewport(-1);
+		QuickSlotPanelWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 
 }

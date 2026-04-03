@@ -34,6 +34,10 @@ public:
 	// 스킬 데이터 테이블 내 모든 ID 조회
 	template<typename T>
 	TArray<FName> GetAllSkillIDs() const;
+	
+	// 스킬 ID를 기반으로 스킬 데이터를 가져오는 함수
+	template <typename T>
+	const T* GetSkillDataByID(const FName& InID) const;
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -128,4 +132,18 @@ TArray<FName> US_GameInstance::GetAllSkillIDs() const
 	}
 
 	return NameList;
+}
+
+template <typename T>
+const T* US_GameInstance::GetSkillDataByID(const FName& InID) const
+{
+	if(SkillTable && SkillTable->GetRowStruct() == T::StaticStruct())
+	{
+		if (const uint8* Data = *(SkillTable->GetRowMap().Find(InID)))
+		{
+			return reinterpret_cast<const T*>(Data);
+		}
+	}
+
+	return nullptr;
 }

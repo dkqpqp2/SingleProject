@@ -30,67 +30,67 @@ enum class EItemType : uint8
 	Mundane UMETA(DisplayName = "일반 아이템")
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemStatistics
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ArmorRating;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageValue;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RestorationAmount;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SellValue;
 	
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemTextData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Name;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText InteractionText;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText UsageText;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemNumericData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Weight;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxStackSize;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	bool bIsStackable;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemAssetData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTexture2D> Icon;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UStaticMesh> Mesh;
 
 };
@@ -110,77 +110,77 @@ struct FIngredientData
 	int32 AmountRequired;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	FName ID;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	EItemType ItemType;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	EItemQuality ItemQuality;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	FItemStatistics ItemStaistics;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	FItemTextData ItemTextData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	FItemNumericData ItemNumericData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	FItemAssetData ItemAssetData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	TArray<FIngredientData> Ingredients;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCraftResultData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ID;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EItemType ItemType;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCraftMaterialData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ID;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EItemType ItemType;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 RequiredCount;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FCraftItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	FName ID;
 	
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	FText CraftDescription;
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	FCraftResultData ResultItemData;
 	
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 	TArray<FCraftMaterialData> MaterialItemDataList;
 };

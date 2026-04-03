@@ -74,7 +74,7 @@ struct FSkillAssetData
 	TObjectPtr<class UNiagaraSystem> SkillEffect; // 스킬 효과
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSkillData : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -99,4 +99,7 @@ struct FSkillData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill Data")
 	int32 RequiredSkillPoints; // 스킬 포인트
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill Data")
+	mutable bool bIsLearned; // 스킬을 배웠는지 여부
 };

@@ -6,6 +6,8 @@
 #include "Character/S_CharacterBase.h"
 #include "Interfaces/S_InteractionInferface.h"
 #include "Interfaces/S_CharacterWidgetInterface.h"
+#include "Data/SkillDataStructs.h"
+#include "TEnums/T_Enums.h"
 #include "S_CharacterPlayer.generated.h"
 
 struct FInputActionValue;
@@ -77,14 +79,15 @@ protected:
 
 	TObjectPtr<class UUserWidget> MiniMapWidget;
 
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class US_CharacterStatComponent> Stat;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class US_WidgetComponent> HpBar;
 
-	virtual void SetupCharacterWidget(class US_UserWidget* InUserWidget)override;
+	virtual void SetupCharacterWidget(class US_UserWidget* InUserWidget) override;
+	
 // 상호작용
 protected:
 	UPROPERTY()
@@ -101,6 +104,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Character | Equipment")
 	TObjectPtr<class US_NewCraftComponent> CraftComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character | Skill")
+	TObjectPtr<class US_SkillComponent> SkillComponent;
 
 	float InteractionCheckFrequency;
 
@@ -165,7 +171,35 @@ protected:
 	TObjectPtr<class UInputAction> DashAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> RollAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
 	TObjectPtr<class UInputAction> SkillMenuAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> SkillSlot_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> SkillSlot_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> SkillSlot_3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> SkillSlot_4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CommonInput, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UInputAction> ConvertAction;
+
+public:
+	void EquipWeapon(class AT_NWeapon* Weapon);
+
+	// TEST
+	UPROPERTY(EditAnywhere, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AT_NWeapon> WeaponClass;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class AT_NWeapon> CurrentWeapon;
 // 함수
 protected:
 	virtual void PostInitializeComponents() override;
@@ -189,9 +223,14 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Attack();
+	void UseSkill(int32 KeyIndex);
 
 	FTimerHandle DashCooldownHandle;
 
+	UPROPERTY(EditAnywhere, Category = Montage, Meta = (AllowPrivateAccess = "ture"))
+	TObjectPtr<class UAnimMontage> RollMontage;
+
+	uint8 bIsRoll : 1;
 	bool bIsDashing = false;
 	float DashDistance = 500.0f;
 	float DashSpeed = 2000.0f;
@@ -203,11 +242,34 @@ protected:
 	
 	void Dash();
 	void EndDash();
+	void RollStart();
+	void RollEnd(class UAnimMontage* Montage, bool IsEnded);
 	void ResetDashCooldown();
 	virtual void SetDead() override;
 
+	void UseSkillSlot_1();
+	void UseSkillSlot_2();
+	void UseSkillSlot_3();
+	void UseSkillSlot_4();
 public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skills")
+	TObjectPtr<class UNiagaraComponent> CurrentSkillEffect;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Skills")
+	TArray<FName> LearnedSkills;
+
+	UFUNCTION(BlueprintCallable, Category = "Skills")
+	void LearnSkill(FName SkillID);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SkillPoint")
 	int32 SkillPoint = 0;
-	
+
+	UFUNCTION()
+	void OnSkillAnimationEnded(UAnimMontage* AnimMontage, bool bInterrupted);
+
+private:
+	bool bIsSkillInUse = false;
+
+
 };

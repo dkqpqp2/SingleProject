@@ -107,7 +107,8 @@ void US_EquipmentSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	Super::NativeOnMouseLeave(InMouseEvent);
 }
 
-void US_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+void US_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 	if (EquippedItem == nullptr)
@@ -137,7 +138,8 @@ void US_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 	}
 }
 
-bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool US_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry,const FDragDropEvent& InDragDropEvent
+	, UDragDropOperation* InOperation)
 {
 	const US_ItemDragDropOperation* ItemDragDropOperation = Cast<US_ItemDragDropOperation>(InOperation);
 
@@ -159,16 +161,20 @@ void US_EquipmentSlot::EquipItemToSlot(US_ItemBase* Item)
 	switch (Item->ItemType)
 	{
 	case EItemType::Weapon:
-		Item->OwningEquipment->EquipItem(ESlotName::Weapon, TEXT("WeaponSocket"), Item);
+		Item->OwningEquipment->EquipItem(ESlotName::Weapon,
+			TEXT("WeaponSocket"), Item);
 		break;
 	case EItemType::Armor:
-		Item->OwningEquipment->EquipItem(ESlotName::Armor, TEXT("ArmorSocket"), Item);
+		Item->OwningEquipment->EquipItem(ESlotName::Armor,
+			TEXT("ArmorSocket"), Item);
 		break;
 	case EItemType::Helmet:
-		Item->OwningEquipment->EquipItem(ESlotName::Helmet, TEXT("HelmetSocket"), Item);
+		Item->OwningEquipment->EquipItem(ESlotName::Helmet,
+			TEXT("HelmetSocket"), Item);
 		break;
 	case EItemType::Shield:
-		Item->OwningEquipment->EquipItem(ESlotName::Shield, TEXT("ShieldSocket"), Item);
+		Item->OwningEquipment->EquipItem(ESlotName::Shield,
+			TEXT("ShieldSocket"), Item);
 		break;
 	default:
 		break;

@@ -15,17 +15,20 @@
 void US_InventoryItemSlot::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
+	UE_LOG(LogTemp, Warning, TEXT("NativeOnInitialized Called"));
     if (ToolTipClass)
     {
 	    US_InventoryToolTip* ToolTip = CreateWidget<US_InventoryToolTip>(this, ToolTipClass);
         ToolTip->InventorySlotBeingHovered = this;
         SetToolTip(ToolTip);
+        
     }
 }
 
 void US_InventoryItemSlot::NativeConstruct()
 {
     Super::NativeConstruct();
+	UE_LOG(LogTemp, Warning, TEXT("NativeConstruct Called"));
 	if (ItemReference)
 	{
 		switch (ItemReference->ItemQuality)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/SkillDataStructs.h"
 #include "S_SkillComponent.generated.h"
 
 
@@ -16,13 +17,12 @@ public:
 	// Sets default values for this component's properties
 	US_SkillComponent();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skill")
+	int32 SkillPoints;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 		
 };

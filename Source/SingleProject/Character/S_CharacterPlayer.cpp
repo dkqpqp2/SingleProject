@@ -8,6 +8,7 @@
 #include "Components/S_NewCraftComponent.h"
 #include "World/S_Pickup.h"
 #include "Items/S_ItemBase.h"
+#include "TWeapon/T_NWeapon.h"
 #include "Components/S_CharacterStatComponent.h"
 
 //Engine
@@ -24,14 +25,20 @@
 #include "UserInterface/UI/S_HpBarWidget.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 //Input
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "S_GameInstance.h"
+#include "UserInterface/QuickSlot/S_QuickSlotPanel.h"
 
 #include "DrawDebugHelpers.h"
+#include "Animation/S_AnimInstance.h"
+#include "Components/S_SkillComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AS_CharacterPlayer::AS_CharacterPlayer()
 {
@@ -51,6 +58,8 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	PlayerEquipment->SetEquipmentTotalArmor(5);
 
 	CraftComponent = CreateDefaultSubobject<US_NewCraftComponent>(TEXT("CraftComponent"));
+	
+	SkillComponent = CreateDefaultSubobject<US_SkillComponent>(TEXT("SkillComponent"));
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -137,17 +146,55 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 		DashAction = InputActionDashRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionRollRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Roll.IA_Roll'"));
+	if (nullptr != InputActionRollRef.Object)
+	{
+		RollAction = InputActionRollRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkillMenuRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_SkillMenu.IA_SkillMenu'"));
 	if(InputActionSkillMenuRef.Object != nullptr)
 	{
 		SkillMenuAction = InputActionSkillMenuRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkill_1Ref(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Slot_1.IA_Slot_1'"));
+	if(InputActionSkill_1Ref.Object != nullptr)
+	{
+		SkillSlot_1 = InputActionSkill_1Ref.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkill_2Ref(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Slot_2.IA_Slot_2'"));
+	if(InputActionSkill_2Ref.Object != nullptr)
+	{
+		SkillSlot_2 = InputActionSkill_2Ref.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkill_3Ref(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Slot_3.IA_Slot_3'"));
+	if(InputActionSkill_3Ref.Object != nullptr)
+	{
+		SkillSlot_3 = InputActionSkill_3Ref.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSkill_4Ref(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_Slot_4.IA_Slot_4'"));
+	if(InputActionSkill_4Ref.Object != nullptr)
+	{
+		SkillSlot_4 = InputActionSkill_4Ref.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionConvert_Ref(TEXT("/Script/EnhancedInput.InputAction'/Game/Character/Input/Actions/IA_ConvertWeapon.IA_ConvertWeapon'"));
+	if(InputActionConvert_Ref.Object != nullptr)
+	{
+		ConvertAction = InputActionConvert_Ref.Object;
+	}
+
+	
+
 	Stat = CreateDefaultSubobject<US_CharacterStatComponent>(TEXT("Stat"));
 
 	HpBar = CreateDefaultSubobject<US_WidgetComponent>(TEXT("HpBar"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 190.0f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/Character/UserInterface/WBP_HpBar.WBP_HpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
@@ -163,6 +210,11 @@ AS_CharacterPlayer::AS_CharacterPlayer()
 	BaseEyeHeight = 76.0f;
 }
 
+void AS_CharacterPlayer::EquipWeapon(class AT_NWeapon* Weapon)
+{
+	Weapon->EquipWeapon(this);
+}
+
 void AS_CharacterPlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -173,6 +225,16 @@ void AS_CharacterPlayer::PostInitializeComponents()
 void AS_CharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("AS_CharacterPlayer BeginPlay"));
+	if (GetWorld())
+	{
+		CurrentWeapon = Cast<AT_NWeapon>(GetWorld()->SpawnActor<AT_NWeapon>(WeaponClass));
+		if (CurrentWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon Spawned"));
+			EquipWeapon(CurrentWeapon);
+		}
+	}
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -202,6 +264,8 @@ void AS_CharacterPlayer::BeginPlay()
 			MiniMapWidget->AddToViewport();
 		}
 	}
+
+	
 }
 
 void AS_CharacterPlayer::Tick(float DeltaTime)
@@ -540,7 +604,12 @@ void AS_CharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleMenu);
 	EnhancedInputComponent->BindAction(CraftMenu, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleCraft);
 	EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::Dash);
+	EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AS_CharacterPlayer::RollStart);
 	EnhancedInputComponent->BindAction(SkillMenuAction, ETriggerEvent::Completed, this, &AS_CharacterPlayer::ToggleSkillMenu);
+	EnhancedInputComponent->BindAction(SkillSlot_1, ETriggerEvent::Triggered, this, &AS_CharacterPlayer::UseSkillSlot_1);
+	EnhancedInputComponent->BindAction(SkillSlot_2, ETriggerEvent::Triggered, this, &AS_CharacterPlayer::UseSkillSlot_2);
+	EnhancedInputComponent->BindAction(SkillSlot_3, ETriggerEvent::Triggered, this, &AS_CharacterPlayer::UseSkillSlot_3);
+	EnhancedInputComponent->BindAction(SkillSlot_4, ETriggerEvent::Triggered, this, &AS_CharacterPlayer::UseSkillSlot_4);
 
 }
 
@@ -569,6 +638,50 @@ void AS_CharacterPlayer::Look(const FInputActionValue& Value)
 void AS_CharacterPlayer::Attack()
 {
 	ProcessComboCommand();
+}
+
+void AS_CharacterPlayer::UseSkill(int32 KeyIndex)
+{
+	if (LearnedSkills.IsValidIndex(KeyIndex))
+	{
+		FName SkillID = LearnedSkills[KeyIndex];  // 해당 키 인덱스에 해당하는 스킬 ID
+
+		// GameInstance에서 SkillData를 가져옵니다
+		US_GameInstance* GameInstance = Cast<US_GameInstance>(GetWorld()->GetGameInstance());
+		if (GameInstance)
+		{
+			const FSkillData* SkillData = GameInstance->GetSkillDataByID<FSkillData>(SkillID);
+			if (SkillData)
+			{
+				// 스킬 애니메이션 실행
+				if (SkillData->SkillAssetData.SkillAnimation)
+				{
+					PlayAnimMontage(SkillData->SkillAssetData.SkillAnimation);
+				}
+
+				// 스킬 이펙트 실행
+				switch (SkillData->SkillType)
+				{
+					case ESkillType::Attack:
+						if (SkillData->SkillAssetData.SkillEffect)
+						{
+							FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 150.0f);
+							CurrentSkillEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SkillData->SkillAssetData.SkillEffect, SpawnLocation);
+						}
+						break;
+					case ESkillType::Defense:
+					case ESkillType::Heal:
+					case ESkillType::Debuff:
+					case ESkillType::Buff:
+						if (SkillData->SkillAssetData.SkillEffect)
+						{
+							CurrentSkillEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SkillData->SkillAssetData.SkillEffect, GetActorLocation());
+						}
+						break;
+				}
+			}
+		}
+	}
 }
 
 void AS_CharacterPlayer::Dash()
@@ -628,6 +741,32 @@ void AS_CharacterPlayer::EndDash()
 	GetWorldTimerManager().SetTimer(DashCooldownHandle, this, &AS_CharacterPlayer::ResetDashCooldown, 5.0f, false);
 }
 
+void AS_CharacterPlayer::RollStart()
+{
+	if (bIsRoll)
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		bIsRoll = true;
+
+		AnimInstance->Montage_Play(RollMontage, 1.3f);
+
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &AS_CharacterPlayer::RollEnd);
+
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, RollMontage);
+	}
+}
+
+void AS_CharacterPlayer::RollEnd(class UAnimMontage* Montage, bool IsEnded)
+{
+	bIsRoll = false;
+}
+
 void AS_CharacterPlayer::ResetDashCooldown()
 {
 	bIsDashCooldown = false;
@@ -638,4 +777,49 @@ void AS_CharacterPlayer::SetDead()
 	Super::SetDead();
 
 	HpBar->SetHiddenInGame(true);
+}
+
+void AS_CharacterPlayer::UseSkillSlot_1()
+{
+	UseSkill(0);
+}
+
+void AS_CharacterPlayer::UseSkillSlot_2()
+{
+	UseSkill(1);
+}
+
+void AS_CharacterPlayer::UseSkillSlot_3()
+{
+	UseSkill(2);
+}
+
+void AS_CharacterPlayer::UseSkillSlot_4()
+{
+	UseSkill(3);
+}
+
+
+void AS_CharacterPlayer::LearnSkill(FName SkillID)
+{
+	if (!LearnedSkills.Contains(SkillID))
+	{
+		LearnedSkills.Add(SkillID);
+		
+		if (HUD->QuickSlotPanelWidget)
+		{
+			HUD->QuickSlotPanelWidget->UpdateQuickSlots(LearnedSkills);  // UI 갱신
+		}
+	}
+
+}
+
+void AS_CharacterPlayer::OnSkillAnimationEnded(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	if (CurrentSkillEffect)
+	{
+		CurrentSkillEffect->DestroyComponent();
+		CurrentSkillEffect = nullptr;  // 이펙트가 끝났으므로 nullptr로 초기화
+	}
+
 }

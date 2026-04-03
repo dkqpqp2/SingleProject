@@ -21,7 +21,7 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnClickedSkill();
+	void OnClickedSkillBtn();
 
 	void OnSkillPointUpdated();
 	UPROPERTY(meta = (BindWidget))
@@ -47,6 +47,8 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> Btn_Learn;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> Btn_Text;
 
 	UPROPERTY()
 	FName SkillID;
